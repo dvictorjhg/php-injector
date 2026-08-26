@@ -1,0 +1,21 @@
+# PHPUnit and build outputs
+.phpunit.cache
+.phpunit.result.cache
+build/
+coverage/
+debug/
+logs/
+
+# Analysis and editor state
+.playwright*/
+.scannerwork/
+.vscode/
+
+# Composer
+composer.lock
+vendor
+
+# System
+.DS_Store
+.zsh_history
+.zshrc

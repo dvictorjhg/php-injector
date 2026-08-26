@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: PHPInjector
+message: If you use this project in research, documentation, or derivative work, please cite it.
+type: software
+authors:
+  - given-names: Victor Jose
+    family-names: Holgado Gallegos
+    email: vihoga@hotmail.es
+    affiliation: Independent Maintainer
+repository-code: https://github.com/dvictorjhg/php-injector
+url: https://github.com/dvictorjhg/php-injector
+license: Apache-2.0
+version: 1.0.0
+abstract: Lightweight reflection-based dependency injection and PSR-11 container for PHP.

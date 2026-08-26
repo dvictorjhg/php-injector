@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.4"
+          - "8.5"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: xdebug
+
+      - name: Validate composer configuration
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run static analysis
+        run: composer analyse
+
+      - name: Run test suite with coverage
+        run: composer test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: build/test-results/clover.xml
+          flags: php-${{ matrix.php-version }}
+          name: php-${{ matrix.php-version }}
+          disable_search: true
+          fail_ci_if_error: true
+          plugins: noop
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Enforce minimum coverage
+        run: composer coverage:check

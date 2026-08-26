@@ -1,0 +1,78 @@
+name: Bug report
+description: Report a defect or regression in PHPInjector.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+
+        Please provide a minimal reproduction and enough detail to verify the issue quickly.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+      placeholder: Describe the bug clearly and concisely.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide a minimal example, code snippet, or repository.
+      placeholder: |
+        1. Install the package
+        2. Run this code
+        3. Observe the failure
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: Describe the expected result.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: Describe the actual result, including error messages.
+    validations:
+      required: true
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: 8.4.x or 8.5.x
+    validations:
+      required: true
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version or commit
+      placeholder: 1.0.0 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Container
+        - Injector
+        - Attributes
+        - Callable injection
+        - Documentation
+        - Tooling / CI
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add anything else that would help diagnose the problem.

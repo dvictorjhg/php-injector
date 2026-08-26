@@ -1,0 +1,58 @@
+name: Feature request
+description: Suggest an improvement or new capability for PHPInjector.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement.
+
+        Please keep requests focused on lightweight dependency injection, container behavior, or closely related tooling.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What limitation or pain point are you trying to solve?
+      placeholder: Describe the current problem.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the API, behavior, or workflow you want.
+      placeholder: Describe the proposed feature.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you evaluate?
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Expected impact
+      options:
+        - Small quality-of-life improvement
+        - New non-breaking capability
+        - Potentially breaking change
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example usage
+      description: Show how you expect the feature to be used.
+      render: php
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the README and existing issues first.
+          required: true
+        - label: This request fits the package scope.
+          required: true
