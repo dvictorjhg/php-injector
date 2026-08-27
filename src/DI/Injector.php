@@ -231,7 +231,9 @@ class Injector
             $instance = $this->providers->get($resolvedClassName);
 
             if (is_object($instance)) {
-                $this->addProvider($storageId, $instance);
+                if ($storageId !== $resolvedClassName) {
+                    $this->addProvider($storageId, $instance);
+                }
 
                 return $instance;
             }
@@ -241,19 +243,19 @@ class Injector
 
         /** @var object $instance */
         if (!$isTransient) {
-            if (!$this->providers->has($resolvedClassName)) {
-                $this->addProvider($resolvedClassName, $instance);
-            }
+            $this->addProvider($resolvedClassName, $instance);
 
-            $this->addProvider($storageId, $instance);
+            if ($storageId !== $resolvedClassName) {
+                $this->addProvider($storageId, $instance);
+            }
         }
 
         return $instance;
     }
 
     /**
-        * Invoke a declared public method, constructor, or static method.
-        *
+     * Invoke a declared public method, constructor, or static method.
+     *
      * @param ReflectionClass<object> $reflectionClass
      * @param array<int|string, mixed> $args
      */
@@ -327,12 +329,24 @@ class Injector
             return $id;
         }
 
-        /** @var object */
-        return $this->inject($reflectionClass->name, $args);
+        $target = $this->resolveStringTarget($reflectionClass->name, $args);
+
+        if (!is_object($target)) {
+            throw new InjectorException(
+                "Target '{$reflectionClass->name}' did not resolve to an object."
+            );
+        }
+
+        return $target;
     }
 
     /**
-     * Resolve one parameter using explicit values, attributes, providers, and defaults.
+     * Resolve one parameter in the lookup order used by every injection target.
+     * Explicit arguments are checked by type key, parameter name, then numeric
+     * position. If none matches, the resolver checks #[Inject], a typed provider,
+     * the PHP default, and finally throws for an unresolved required parameter.
+     * Variadic parameters collect positional values from their position onward,
+     * and array-valued providers are expanded into individual arguments.
      *
      * @param array<int|string, mixed> $args
      * @return array<int, mixed>
@@ -342,22 +356,14 @@ class Injector
         $parameterType = $reflectionParameter->getType();
         $parameterTypeName = InjectorHelper::resolveParameterTypeName($parameterType);
         $resolvedValues = [];
-        $provider = $reflectionParameter->isVariadic()
-            ? InjectorHelper::getArgumentValue(
-                $args,
-                $parameterTypeName,
-                $reflectionParameter->name,
-                $reflectionParameter->getPosition(),
-                $this->missingValue,
-                true
-            )
-            : InjectorHelper::getArgumentValue(
-                $args,
-                $parameterTypeName,
-                $reflectionParameter->name,
-                $reflectionParameter->getPosition(),
-                $this->missingValue
-            );
+        $provider = InjectorHelper::getArgumentValue(
+            $args,
+            $parameterTypeName,
+            $reflectionParameter->name,
+            $reflectionParameter->getPosition(),
+            $this->missingValue,
+            $reflectionParameter->isVariadic()
+        );
 
         if ($provider === $this->missingValue) {
             $provider = InjectorHelper::resolveProviderFromAttribute(
@@ -395,7 +401,8 @@ class Injector
     }
 
     /**
-     * Find a provider in this injector or any parent injector.
+     * Find a provider in this injector or its parent chain, checking the
+     * current injector first.
      *
      * Class-string providers requested for non-builtin typed parameters are
      * resolved before being returned so their concrete instance can be cached.
@@ -413,7 +420,7 @@ class Injector
                     && !$type->isBuiltin()
                     && is_string($provider)
                 ) {
-                    $provider = $injector->inject($provider);
+                    $provider = $injector->resolveStringTarget($provider, []);
                 }
 
                 return $provider;

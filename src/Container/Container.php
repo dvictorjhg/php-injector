@@ -35,7 +35,7 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
      * @throws ContainerException When a list entry cannot produce an identifier
      *     or when normalized identifiers are duplicated.
      */
-    public function __construct(private(set) array $content = [])
+    public function __construct(private array $content = [])
     {
         $processedContent = [];
 
