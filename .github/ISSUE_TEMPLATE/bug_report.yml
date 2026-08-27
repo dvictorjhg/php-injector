@@ -47,14 +47,14 @@ body:
     id: php-version
     attributes:
       label: PHP version
-      placeholder: 8.4.x or 8.5.x
+      placeholder: 8.3.x, 8.4.x, or 8.5.x
     validations:
       required: true
   - type: input
     id: package-version
     attributes:
       label: Package version or commit
-      placeholder: 1.0.0 or commit SHA
+      placeholder: 1.0.1 or commit SHA
     validations:
       required: true
   - type: dropdown

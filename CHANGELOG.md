@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows Semantic Versioning.
 
+## [1.0.1] - 2026-08-27
+
+### Added
+
+- Regression coverage for parent provider inheritance and explicit arguments overriding `#[Inject]` attributes.
+- A rebuilt static documentation experience with English and Spanish translations, theme switching, and expanded guide sections.
+
+### Changed
+
+- Refined parameter and provider resolution, including explicit argument precedence and parent-provider alias handling.
+- Lowered the minimum supported PHP version to 8.3, matching the syntax used by the package and test suite.
+- Updated usage, resolution, and contributor guidance.
+
 ## [1.0.0] - 2026-08-26
 
 ### Added
