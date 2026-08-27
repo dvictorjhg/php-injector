@@ -150,7 +150,6 @@ final class InjectorHelperTest extends TestCase
             [],
             static function (mixed $_reflector = null, array $_args = []) use (&$parameterResolutionWasCalled): array {
                 $parameterResolutionWasCalled = $_reflector instanceof ReflectionMethod && $_args === [];
-                $parameterResolutionWasCalled = true;
 
                 return [];
             }

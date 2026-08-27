@@ -172,6 +172,25 @@ final class InjectorTest extends TestCase
     }
 
     #[Group(self::TEST_CLASS_INJECTION)]
+    public function testParentAliasResolvesAgainstTheParentInjectorProviders(): void
+    {
+        $parentProvider = $this->simpleProvider('parent-injector');
+        $parentInjector = $this->createInjector([
+            Provider::class => SimpleProvider::class,
+            SimpleProvider::class => $parentProvider,
+        ]);
+        $childProvider = $this->simpleProvider('child-injector');
+        $childInjector = $this->createInjector([SimpleProvider::class => $childProvider], $parentInjector);
+
+        $resolvedProvider = $childInjector->inject([
+            Methods::class,
+            'staticMethodWithProviderClassParameter',
+        ]);
+
+        $this->assertSame($parentProvider, $resolvedProvider);
+    }
+
+    #[Group(self::TEST_CLASS_INJECTION)]
     public function testInjectAliasAndConcreteClassReuseTheSameSingletonInstance(): void
     {
         $injector = $this->createInjector([Provider::class => SimpleProvider::class]);
@@ -500,6 +519,19 @@ final class InjectorTest extends TestCase
         $result = $injector->inject([Methods::class, 'staticMethodWithNullableParameter'], ['value' => null]);
 
         $this->assertNull($result);
+    }
+
+    #[Group(self::TEST_METHOD_INJECTION)]
+    #[Group(self::TEST_INJECT_ATTRIBUTE)]
+    public function testExplicitArgumentOverridesInjectAttributeForTheSameParameter(): void
+    {
+        $injector = $this->createInjector(['nullable' => 'from-attribute']);
+        $result = $injector->inject(
+            [Methods::class, 'staticMethodWithNullableParameterProvidedViaInjectParameterAttribute'],
+            ['value' => 'from-arguments']
+        );
+
+        $this->assertSame('from-arguments', $result);
     }
 
     #[Group(self::TEST_METHOD_INJECTION)]
