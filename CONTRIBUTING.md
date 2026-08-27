@@ -39,7 +39,7 @@ The above example will output:
 ```text
 PHPUnit 11.x by Sebastian Bergmann and contributors.
 
-OK (109 tests, 219 assertions)
+OK (111 tests, 221 assertions)
 ```
 
 If you switch branches, move files, or see repeated `Class ... not found` errors during the test run, refresh Composer autoload files and rerun the suite:

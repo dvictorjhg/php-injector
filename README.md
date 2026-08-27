@@ -9,7 +9,7 @@ PHPInjector exists for projects that want constructor and method injection witho
 
 ## Documentation
 
-The [PHPInjector documentation page](docs/index.html) is the visual entry point for installation, common injection targets, provider lifecycles, parameter resolution, and the public API. It is self-contained and ready to publish through GitHub Pages from the repository's `/docs` directory. It defaults to the `en_US` locale and light theme; both preferences can be changed from the header and persist in the browser. This README remains the copy-and-paste reference for the full examples.
+The [PHPInjector documentation page](docs/index.html) is the visual entry point for installation, common injection targets, provider lifecycles, parameter resolution, and the public API. It is a static GitHub Pages site with relative CSS and JavaScript assets under `/docs/assets`. It defaults to English and the light theme; both preferences can be changed from the header and persist in the browser. This README remains the copy-and-paste reference for the full examples.
 
 ## Why Use PHPInjector
 
@@ -152,7 +152,7 @@ Class-string providers and alias mappings are instantiated lazily and cached aft
 
 ### Example #3 Inject methods and other callables
 
-PHPInjector can resolve more than constructors. The next example uses an instance method, a closure, a global function, and a callable string:
+PHPInjector can resolve more than constructors. The next example uses an instance method, a closure, and a callable string:
 
 ```php
 <?php
@@ -193,7 +193,6 @@ $injector = new Injector([
 
 echo Injector::inject([ReportController::class, 'show'], ['name' => 'sales']) . PHP_EOL;
 echo Injector::inject(static fn (Logger $logger): string => "closure: {$logger->channel}") . PHP_EOL;
-echo Injector::inject('strlen', ['string' => 'cache']) . PHP_EOL;
 echo Injector::inject('ReportJobs::warm');
 ```
 
@@ -202,11 +201,12 @@ The above example will output:
 ```text
 sales via app
 closure: app
-5
 warming app
 ```
 
 Callables can be provided as closures, array callables, callable strings, global function names, or first-class callables.
+
+In the `strlen` call, `$args` is the second argument passed to `Injector::inject()`. The `string` key matches the parameter of the built-in callable; it is not a provider registration.
 
 ### Example #4 Bind scalar values explicitly
 
@@ -229,10 +229,12 @@ final class ReportLabel
 
 $injector = new Injector();
 
-echo Injector::inject([ReportLabel::class, 'build'], [
+$args = [
     'name' => 'Quarterly Sales',
     'formal' => true,
-]);
+];
+
+echo Injector::inject([ReportLabel::class, 'build'], $args);
 ```
 
 The above example will output:
@@ -487,48 +489,110 @@ api,worker
 
 ### Resolution order
 
-For each parameter, PHPInjector walks a fixed lookup chain and stops at the first match.
+#### What `$args` means here
 
-1. Explicit per-call arguments.
-2. `#[Inject('id')]` attribute lookup.
-3. Registered provider lookup for a non-builtin parameter type.
-4. PHP default parameter value.
-5. Exception if nothing matches.
+In `Injector::inject($target, $args)`, `$args` is the optional map of values supplied for one injection call. It is separate from the reusable provider map passed to `new Injector([...])`; the target still declares its own parameters, and PHPInjector uses the `$args` keys to match them.
 
-The important detail is that step 1 has its own internal precedence. When you pass `$args`, PHPInjector checks them in this order for each parameter:
+For a target with a `Logger $logger` parameter, these are alternative ways to pass the same value. In every call, the array after `$target` is the per-call `$args` map:
 
-1. Type key, for example `Logger::class => $logger`.
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+final class Logger
+{
+    public function __construct(public string $channel)
+    {
+    }
+}
+
+$logger = new Logger('worker');
+$target = static fn (Logger $logger): string => $logger->channel;
+
+echo Injector::inject($target, [Logger::class => $logger]) . PHP_EOL;
+echo Injector::inject($target, ['logger' => $logger]) . PHP_EOL;
+echo Injector::inject($target, [$logger]) . PHP_EOL;
+```
+
+The three calls will each output:
+
+```text
+worker
+worker
+worker
+```
+
+The same meaning applies when the target is a PHP built-in callable:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+$args = ['string' => 'cache'];
+$length = Injector::inject('strlen', $args);
+echo $length;
+```
+
+This will output:
+
+```text
+5
+```
+
+Here, `string` names `strlen`'s parameter, while `$args` remains the second argument to `Injector::inject()`.
+
+For each parameter, PHPInjector starts at step 1 and stops at the first successful match:
+
+1. Explicit per-call arguments: check the type key, then the parameter name, then numeric position.
+2. `#[Inject('id')]` attribute lookup, only when no explicit argument matched.
+3. Registered provider lookup for a supported non-builtin named parameter type.
+4. PHP default parameter value, when one exists.
+5. `InjectorException` when the required parameter is still unresolved.
+
+Step 1 has its own internal precedence. When you pass `$args` as the second argument to `Injector::inject()`, PHPInjector checks it in this order for each parameter:
+
+1. Type key for a supported non-builtin named type, for example `Logger::class => $logger`.
 2. Parameter name, for example `'logger' => $logger`.
-3. Numeric position, for example `[0 => $logger]`.
+3. Numeric position for a non-variadic parameter, for example `[0 => $logger]`.
 
 Use one argument style per call. Mixed-key arrays such as `[Logger::class => $logger, 0 => $fallback]` are rejected.
 
-When step 3 runs, provider lookup checks the active injector first and then walks up the parent injector staircase until a matching provider is found or the chain ends. Passing an explicit parent to the constructor overrides the automatic parent selection.
+When step 2 or 3 runs, provider lookup checks the active injector first and then walks up the parent injector staircase until a matching provider is found or the chain ends. Passing an explicit parent to the constructor overrides the automatic parent selection.
 
-Automatic type-based lookup supports registered non-builtin named types, including concrete classes, interfaces, abstract classes, enum instances, nullable named types, and `Closure` providers registered under `Closure::class`. Built-in types, `callable`, untyped parameters, and union, intersection, or DNF types require an explicit value in `$args`, a named provider through `#[Inject('id')]`, or a PHP default. The injector does not choose between multiple compound-type candidates automatically.
+Automatic type-based lookup supports registered non-builtin named types, including concrete classes, interfaces, abstract classes, enum instances, nullable named types, and `Closure` providers registered under `Closure::class`. Built-in types, `callable`, untyped parameters, and union, intersection, or DNF types require an explicit value in the per-call `$args` map, a named provider through `#[Inject('id')]`, or a PHP default. The injector does not choose between multiple compound-type candidates automatically.
 
-Variadic parameters accept zero or more values. Positional values from the variadic parameter's position onward are expanded, and an array-valued provider is expanded into individual arguments.
+Variadic parameters accept zero or more values. Numeric values from the variadic parameter's position onward are collected, and an array-valued provider is expanded into individual arguments.
 
 #### Parameter resolution flow
 
 ```mermaid
 flowchart TD
     start([Start parameter resolution]) --> args{Matching explicit argument?}
-    args -->|Yes| done([Use explicit argument])
+    args -->|Yes: stop| done([Use explicit argument])
     args -->|No| attr{Has Inject attribute?}
-    attr -->|Yes, provider found| attrDone([Use named provider])
-    attr -->|No match| typed{Non-builtin type with registered provider?}
-    typed -->|Yes| typedDone([Use typed provider])
+    attr -->|Yes| attrLookup[Look up attribute ID in active -> parent chain]
+    attr -->|No| typed{Supported non-builtin named type?}
+    attrLookup -->|Provider found: stop| attrDone([Use named provider])
+    attrLookup -->|No provider| typed
+    typed -->|Yes| typedLookup[Look up type in active -> parent chain]
     typed -->|No| default{Default value available?}
+    typedLookup -->|Provider found: stop| typedDone([Use typed provider])
+    typedLookup -->|No provider| default
     default -->|Yes| defaultDone([Use default value])
-    default -->|No| error([Throw InjectorException])
+    default -->|No: stop| error([Throw InjectorException])
 ```
 
 #### Explicit argument precedence
 
 ```mermaid
 flowchart TD
-    start([Resolve from $args]) --> type{Type key exists?}
+    start([Resolve from per-call $args]) --> type{Type key exists?}
     type -->|Yes| typeDone([Use value from class-string key])
     type -->|No| name{Parameter name exists?}
     name -->|Yes| nameDone([Use value from parameter name])
