@@ -41,16 +41,16 @@ class Injector
     private readonly object $missingValue;
 
     /**
-        * Create an injector with optional providers and a parent fallback.
-        *
-        * When no parent is supplied, the previously active injector becomes
-        * this injector's parent. The new injector then becomes active.
-        *
+     * Create an injector with optional providers and a parent fallback.
+     *
+     * When no parent is supplied, the previously active injector becomes
+     * this injector's parent. The new injector then becomes active.
+     *
      * @param array<class-string|int|string, mixed>|Container<mixed> $providers
-        * @param ?self $parent Provider lookup continues through this injector when
-        *     the current injector has no matching identifier.
-        * @throws \PHPInjector\Container\ContainerException When list-style
-        *     providers contain invalid or duplicate identifiers.
+     * @param ?self $parent Provider lookup continues through this injector when
+     *     the current injector has no matching identifier.
+     * @throws \PHPInjector\Container\ContainerException When list-style
+     *     providers contain invalid or duplicate identifiers.
      */
     public function __construct(array|Container $providers = [], ?self $parent = null)
     {
@@ -61,18 +61,19 @@ class Injector
     }
 
     /**
-        * Resolve an injection target through the active injector.
-        *
-        * Supported targets include class names, class/object method arrays,
-        * callable strings, closures, and invokable objects. Explicit arguments
-        * may be keyed by class name, parameter name, or numeric position, but one
-        * call cannot mix string and integer keys.
-        *
-        * @param array<int|string, mixed>|callable|class-string|object|string $injectionTarget
-        * @param array<int|string, mixed> $args
-        * @throws InjectorException When the target, callable, method, provider,
-        *     or required parameter cannot be resolved.
-        */
+     * Resolve an injection target through the active injector.
+     *
+     * Supported targets include class names, class/object method arrays,
+     * callable strings, closures, and invokable objects. Each reflected
+     * parameter checks explicit arguments (type key, name, position), then
+     * #[Inject], a typed provider, its PHP default, and finally an exception.
+     * Provider lookup checks the active injector before its parent chain.
+     *
+     * @param array<int|string, mixed>|callable|class-string|object|string $injectionTarget
+     * @param array<int|string, mixed> $args
+     * @throws InjectorException When the target, callable, method, provider,
+     *     or required parameter cannot be resolved.
+     */
     public static function inject(array|callable|object|string $injectionTarget, array $args = []): mixed
     {
         $injector = self::instance();
@@ -109,8 +110,8 @@ class Injector
     }
 
     /**
-        * Reflect an object or class and dispatch it to constructor or method injection.
-        *
+     * Reflect an object or class and dispatch it to constructor or method injection.
+     *
      * @param array<int|string, mixed> $args
      */
     private function injectObject(object|string $id, array $args = [], ?string $methodName = null): mixed
@@ -139,8 +140,10 @@ class Injector
     }
 
     /**
-        * Resolve every reflected parameter using the documented precedence order.
-        *
+     * Resolve every reflected parameter using the documented precedence order.
+     * Each parameter stops at the first match: explicit argument, #[Inject],
+     * typed provider, PHP default, or required-parameter exception.
+     *
      * @param ReflectionMethod|ReflectionFunction $reflector
      * @param array<int|string, mixed> $args
      * @return array<int, mixed>
@@ -158,9 +161,9 @@ class Injector
     }
 
     /**
-        * Route a non-callable target to method, object, or class resolution.
-        *
-    * @param array<int|string, mixed>|class-string|object|string $injectionTarget
+     * Route a non-callable target to method, object, or class resolution.
+     *
+     * @param array<int|string, mixed>|class-string|object|string $injectionTarget
      * @param array<int|string, mixed> $args
      */
     private function injectNonCallableTarget(array|object|string $injectionTarget, array $args): mixed
@@ -182,8 +185,8 @@ class Injector
     }
 
     /**
-        * Look up a string identifier and fall back to direct class construction.
-        *
+     * Look up a string identifier and fall back to direct class construction.
+     *
      * @param array<int|string, mixed> $args
      */
     private function resolveStringTarget(string $injectionTarget, array $args): mixed
@@ -206,11 +209,11 @@ class Injector
     }
 
     /**
-        * Construct a concrete class and cache it under its concrete and alias IDs.
-        *
-        * Transient classes skip both cache writes. Existing provider objects are
-        * always returned as supplied, including when their class is marked transient.
-        *
+     * Construct a concrete class and cache it under its concrete and alias IDs.
+     *
+     * Transient classes skip both cache writes. Existing provider objects are
+     * always returned as supplied, including when their class is marked transient.
+     *
      * @param array<int|string, mixed> $args
      */
     private function instantiateAndStore(
@@ -280,8 +283,8 @@ class Injector
     }
 
     /**
-        * Invoke __call() or __callStatic() when the requested method is undefined.
-        *
+     * Invoke __call() or __callStatic() when the requested method is undefined.
+     *
      * @param ReflectionClass<object> $reflectionClass
      * @param array<int|string, mixed> $args
      */
@@ -313,8 +316,8 @@ class Injector
     }
 
     /**
-        * Obtain the object on which an instance method should run.
-        *
+     * Obtain the object on which an instance method should run.
+     *
      * @param ReflectionClass<object> $reflectionClass
      * @param array<int|string, mixed> $args
      */

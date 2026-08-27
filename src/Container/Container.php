@@ -139,8 +139,8 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
     }
 
     /**
-        * Iterate over identifiers and their stored providers.
-        *
+     * Iterate over identifiers and their stored providers.
+     *
      * @return ArrayIterator<int|string, mixed>
      */
     public function getIterator(): ArrayIterator

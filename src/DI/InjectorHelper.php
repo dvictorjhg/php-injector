@@ -49,11 +49,11 @@ final class InjectorHelper
     }
 
     /**
-    * @param array<int|string, mixed>|mixed $injectionTarget
+     * @param array<int|string, mixed>|mixed $injectionTarget
      * @phpstan-assert-if-true array{0: class-string|object, 1: string} $injectionTarget
-        *
-        * A valid method target contains exactly an object or existing class name
-        * followed by a string method name.
+     *
+     * A valid method target contains exactly an object or existing class name
+     * followed by a string method name.
      */
     public static function isMethodTarget(mixed $injectionTarget): bool
     {
@@ -69,8 +69,8 @@ final class InjectorHelper
     }
 
     /**
-        * Route each supported callable shape to the matching injection path.
-        *
+     * Route each supported callable shape to the matching injection path.
+     *
      * @param array<int|string, mixed> $args
      * @param Closure(object|string, array<int|string, mixed>, string|null): mixed $injectObject
      * @param Closure(Closure|string, array<int|string, mixed>): mixed $injectFunction
@@ -107,11 +107,11 @@ final class InjectorHelper
     }
 
     /**
-        * Invoke a function or closure after resolving its parameters.
-        *
+     * Invoke a function or closure after resolving its parameters.
+     *
      * @param array<int|string, mixed> $args
-        * @param Closure(ReflectionMethod|ReflectionFunction, array<int|string, mixed>): array<int|string, mixed> $resolveParameters
-        * @throws InjectorException When a named function cannot be reflected.
+     * @param Closure(ReflectionMethod|ReflectionFunction, array<int|string, mixed>): array<int|string, mixed> $resolveParameters
+     * @throws InjectorException When a named function cannot be reflected.
      */
     public static function injectFunction(Closure|string $function, array $args, Closure $resolveParameters): mixed
     {
@@ -125,13 +125,13 @@ final class InjectorHelper
     }
 
     /**
-        * Construct a reflected class, resolving constructor parameters when needed.
-        *
+     * Construct a reflected class, resolving constructor parameters when needed.
+     *
      * @param array<int|string, mixed> $args
-        * @template TObject of object
-        * @param ReflectionClass<TObject> $reflectionClass
-        * @param Closure(ReflectionMethod|ReflectionFunction, array<int|string, mixed>): array<int|string, mixed> $resolveParameters
-        * @return TObject
+     * @template TObject of object
+     * @param ReflectionClass<TObject> $reflectionClass
+     * @param Closure(ReflectionMethod|ReflectionFunction, array<int|string, mixed>): array<int|string, mixed> $resolveParameters
+     * @return TObject
      */
     public static function instantiateClass(ReflectionClass $reflectionClass, array $args, Closure $resolveParameters): object
     {
@@ -210,6 +210,7 @@ final class InjectorHelper
 
     /**
      * Resolve the provider named by the first Inject attribute, if present.
+     * The caller invokes this after explicit arguments have no match.
      */
     public static function resolveProviderFromAttribute(
         \ReflectionParameter $reflectionParameter,
@@ -228,6 +229,7 @@ final class InjectorHelper
 
     /**
      * Resolve a provider for a supported non-builtin named parameter type.
+     * The caller invokes this after explicit and attribute lookup have no match.
      */
     public static function resolveProviderFromType(
         \ReflectionType|null $parameterType,
@@ -245,8 +247,11 @@ final class InjectorHelper
     }
 
     /**
-        * Find an explicit argument by type, name, then numeric position.
-        *
+     * Find an explicit argument by type key, parameter name, then position.
+     * Type-key lookup is available only for a non-builtin named parameter type.
+     * For variadics, collect every numeric value from the parameter position
+     * onward instead of resolving a single positional value.
+     *
      * @param array<int|string, mixed> $args
      */
     public static function getArgumentValue(
@@ -282,8 +287,8 @@ final class InjectorHelper
     }
 
     /**
-        * Check whether a class opts out of injector-managed caching.
-        *
+     * Check whether a class opts out of injector-managed caching.
+     *
      * @template TObject of object
      * @param ReflectionClass<TObject> $reflectionClass
      */
@@ -293,8 +298,8 @@ final class InjectorHelper
     }
 
     /**
-        * Detect a mixture of integer and string keys in an argument array.
-        *
+     * Detect a mixture of integer and string keys in an argument array.
+     *
      * @param array<mixed> $arr
      */
     private static function arrayHasMixedKeys(array $arr): bool
