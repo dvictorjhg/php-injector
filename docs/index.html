@@ -3,1014 +3,30 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="PHPInjector documentation: reflection-based dependency injection and PSR-11 provider storage for PHP 8.4+.">
-    <title>PHPInjector | Dependency injection for modern PHP</title>
-    <script>
-        (() => {
-            try {
-                const savedTheme = localStorage.getItem('phpinjector-theme');
-                if (savedTheme === 'dark' || savedTheme === 'light') {
-                    document.documentElement.dataset.theme = savedTheme;
-                }
-            } catch {}
-        })();
-    </script>
+    <meta name="description" content="A focused PHP dependency injector built around reflection, explicit arguments, attributes, providers, and predictable lifecycles.">
+    <title>PHP Injector | Reflection-first dependency injection</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --paper: #f5f2e9;
-            --surface: #fffdf8;
-            --ink: #102f30;
-            --deep: #102f30;
-            --muted: #55706c;
-            --line: #cbd6cb;
-            --teal: #0a716c;
-            --teal-soft: #d7ebe1;
-            --coral: #e46550;
-            --yellow: #efc85b;
-            --blue: #4d72d6;
-            --white: #fffdf8;
-            --code: #173d3e;
-            --shadow: 0 18px 44px rgba(16, 47, 48, 0.12);
-        }
-
-        html[data-theme="dark"] {
-            --paper: #102020;
-            --surface: #173637;
-            --ink: #edf3e9;
-            --deep: #0b2021;
-            --muted: #b8ccc1;
-            --line: #365b59;
-            --teal: #8cd8c1;
-            --teal-soft: #224c4b;
-            --coral: #f48c75;
-            --yellow: #f3d16c;
-            --blue: #9bb0f2;
-            --white: #faf7ec;
-            --code: #102b2c;
-            --shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            color: var(--ink);
-            background-color: var(--paper);
-            background-image: repeating-linear-gradient(
-                0deg,
-                rgba(16, 47, 48, 0.035) 0,
-                rgba(16, 47, 48, 0.035) 1px,
-                transparent 1px,
-                transparent 36px
-            );
-            font-family: "DM Sans", sans-serif;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        a {
-            color: inherit;
-        }
-
-        code,
-        pre,
-        .eyebrow,
-        .version,
-        .source-link,
-        .table-label {
-            font-family: "Space Mono", monospace;
-        }
-
-        code {
-            padding: 0.12rem 0.3rem;
-            color: var(--teal);
-            background: var(--teal-soft);
-            border-radius: 2px;
-            font-size: 0.9em;
-        }
-
-        pre {
-            margin: 0;
-            overflow-x: auto;
-            color: #f7f4ea;
-            background: var(--code);
-            border: 1px solid rgba(255, 253, 248, 0.12);
-            border-radius: 3px;
-            font-size: 0.83rem;
-            line-height: 1.75;
-            tab-size: 4;
-        }
-
-        pre code {
-            display: block;
-            padding: 1.2rem 1.35rem;
-            color: inherit;
-            background: transparent;
-            border-radius: 0;
-            font-size: inherit;
-        }
-
-        .wrap {
-            width: min(1180px, calc(100% - 40px));
-            margin: 0 auto;
-        }
-
-        .site-header {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            border-bottom: 1px solid rgba(203, 214, 203, 0.9);
-            background: rgba(245, 242, 233, 0.96);
-            backdrop-filter: blur(14px);
-        }
-
-        html[data-theme="dark"] body {
-            background-image: repeating-linear-gradient(
-                0deg,
-                rgba(237, 243, 233, 0.035) 0,
-                rgba(237, 243, 233, 0.035) 1px,
-                transparent 1px,
-                transparent 36px
-            );
-        }
-
-        html[data-theme="dark"] .site-header {
-            border-bottom-color: rgba(54, 91, 89, 0.9);
-            background: rgba(16, 32, 32, 0.96);
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 72px;
-            gap: 24px;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            min-width: 0;
-        }
-
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--ink);
-            font-size: 1.05rem;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .brand-mark {
-            display: grid;
-            place-items: center;
-            width: 34px;
-            height: 34px;
-            color: var(--white);
-            background: var(--coral);
-            border: 2px solid var(--ink);
-            border-radius: 3px;
-            font-family: "Space Mono", monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .version {
-            margin-left: 2px;
-            color: var(--muted);
-            font-size: 0.68rem;
-            font-weight: 400;
-            letter-spacing: 0;
-        }
-
-        .nav-tools {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .theme-toggle {
-            display: inline-flex;
-            align-items: center;
-            margin: 0;
-            padding: 3px;
-            border: 1px solid var(--line);
-            border-radius: 3px;
-            background: var(--surface);
-        }
-
-        .theme-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            min-height: 30px;
-            padding: 4px 8px;
-            color: var(--muted);
-            background: transparent;
-            border: 0;
-            border-radius: 2px;
-            cursor: pointer;
-            font: 600 0.72rem "DM Sans", sans-serif;
-        }
-
-        .theme-button[aria-pressed="true"] {
-            color: var(--surface);
-            background: var(--ink);
-        }
-
-        .theme-button:hover,
-        .theme-button:focus-visible {
-            color: var(--coral);
-        }
-
-        .theme-button[aria-pressed="true"]:hover,
-        .theme-button[aria-pressed="true"]:focus-visible {
-            color: var(--surface);
-        }
-
-        .theme-icon {
-            font-size: 0.9rem;
-            line-height: 1;
-        }
-
-        .language-picker {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .language-picker select {
-            min-height: 38px;
-            max-width: 100%;
-            padding: 5px 28px 5px 9px;
-            color: var(--ink);
-            background-color: var(--surface);
-            border: 1px solid var(--line);
-            border-radius: 3px;
-            cursor: pointer;
-            font: 600 0.72rem "Space Mono", monospace;
-        }
-
-        .language-picker select:focus-visible,
-        .theme-button:focus-visible,
-        .button-link:focus-visible,
-        a:focus-visible {
-            outline: 3px solid var(--coral);
-            outline-offset: 3px;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-            color: var(--muted);
-            font-size: 0.92rem;
-            font-weight: 600;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-        }
-
-        .nav-links a:hover,
-        .nav-links a:focus-visible {
-            color: var(--coral);
-        }
-
-        .nav-github {
-            color: var(--ink);
-            border-bottom: 2px solid var(--coral);
-        }
-
-        .hero {
-            color: var(--white);
-            background-color: var(--deep);
-            background-image: repeating-linear-gradient(
-                90deg,
-                rgba(255, 253, 248, 0.055) 0,
-                rgba(255, 253, 248, 0.055) 1px,
-                transparent 1px,
-                transparent 88px
-            );
-            border-bottom: 8px solid var(--yellow);
-        }
-
-        .hero-inner {
-            padding: 84px 0 72px;
-        }
-
-        .eyebrow {
-            margin: 0 0 18px;
-            color: var(--yellow);
-            font-size: 0.74rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        h1,
-        h2,
-        h3,
-        p {
-            margin-top: 0;
-        }
-
-        h1,
-        h2,
-        h3 {
-            line-height: 1.08;
-            letter-spacing: 0;
-            overflow-wrap: anywhere;
-        }
-
-        h1 {
-            max-width: 900px;
-            margin-bottom: 20px;
-            color: var(--white);
-            font-size: 5.75rem;
-            font-weight: 700;
-        }
-
-        .hero-lede {
-            max-width: 720px;
-            margin-bottom: 30px;
-            color: #d9e8df;
-            font-size: 1.25rem;
-        }
-
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 48px;
-        }
-
-        .button-link {
-            display: inline-flex;
-            align-items: center;
-            min-height: 44px;
-            padding: 9px 16px;
-            border: 1px solid var(--yellow);
-            border-radius: 2px;
-            color: var(--deep);
-            background: var(--yellow);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .button-link:hover,
-        .button-link:focus-visible {
-            background: #f8d77b;
-        }
-
-        .button-link.secondary {
-            color: var(--white);
-            background: transparent;
-            border-color: rgba(255, 253, 248, 0.4);
-        }
-
-        .button-link.secondary:hover,
-        .button-link.secondary:focus-visible {
-            background: rgba(255, 253, 248, 0.1);
-        }
-
-        .quickstart {
-            max-width: 920px;
-            border-left: 5px solid var(--coral);
-            background: var(--code);
-            box-shadow: var(--shadow);
-        }
-
-        .quickstart-label {
-            display: block;
-            padding: 12px 20px 0;
-            color: #f4d487;
-            font-family: "Space Mono", monospace;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        .quickstart pre {
-            border: 0;
-            background: transparent;
-        }
-
-        .section {
-            padding: 82px 0;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .section.mint {
-            background: var(--teal-soft);
-        }
-
-        .section.ink {
-            color: var(--white);
-            background: var(--deep);
-            border-bottom-color: #285455;
-        }
-
-        .section-heading {
-            display: grid;
-            grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
-            gap: 60px;
-            align-items: start;
-            margin-bottom: 42px;
-        }
-
-        .section-heading > * {
-            min-width: 0;
-        }
-
-        .section-heading h2 {
-            margin-bottom: 0;
-            font-size: 2.8rem;
-            font-weight: 700;
-        }
-
-        .section-heading p {
-            max-width: 620px;
-            margin-bottom: 0;
-            color: var(--muted);
-            font-size: 1.07rem;
-        }
-
-        .ink .section-heading p,
-        .ink .muted {
-            color: #bdd2c8;
-        }
-
-        .section-number {
-            display: block;
-            margin-bottom: 12px;
-            color: var(--coral);
-            font-family: "Space Mono", monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .guide-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 46px;
-        }
-
-        .guide-block {
-            min-width: 0;
-            padding-top: 18px;
-            border-top: 3px solid var(--ink);
-        }
-
-        .guide-block h3 {
-            margin-bottom: 10px;
-            font-size: 1.45rem;
-        }
-
-        .guide-block p {
-            margin-bottom: 22px;
-            color: var(--muted);
-        }
-
-        .guide-block pre {
-            box-shadow: 0 10px 22px rgba(16, 47, 48, 0.1);
-        }
-
-        .provider-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--surface);
-        }
-
-        .provider-table-wrap {
-            width: 100%;
-            overflow-x: auto;
-            background: var(--surface);
-            box-shadow: var(--shadow);
-        }
-
-        .provider-table th,
-        .provider-table td {
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--line);
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .provider-table th {
-            color: var(--muted);
-            background: #e9eee6;
-            font-family: "Space Mono", monospace;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        html[data-theme="dark"] .provider-table th {
-            background: #214344;
-        }
-
-        .provider-table tr:last-child td {
-            border-bottom: 0;
-        }
-
-        .provider-table td:first-child {
-            width: 33%;
-            color: var(--teal);
-            font-family: "Space Mono", monospace;
-            font-size: 0.86rem;
-        }
-
-        .callout {
-            display: grid;
-            grid-template-columns: auto minmax(0, 1fr);
-            gap: 16px;
-            align-items: start;
-            margin-top: 28px;
-            padding: 18px 20px;
-            border-left: 5px solid var(--coral);
-            background: var(--surface);
-        }
-
-        .callout strong {
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        .callout p {
-            margin-bottom: 0;
-            color: var(--muted);
-        }
-
-        .callout-mark {
-            display: grid;
-            place-items: center;
-            width: 24px;
-            height: 24px;
-            color: var(--ink);
-            background: var(--yellow);
-            border-radius: 50%;
-            font-family: "Space Mono", monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .lifecycle-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 18px;
-        }
-
-        .lifecycle-item {
-            min-height: 260px;
-            padding: 26px 24px 24px;
-            color: var(--ink);
-            background: var(--surface);
-            border-top: 6px solid var(--teal);
-        }
-
-        .lifecycle-item:nth-child(2) {
-            border-top-color: var(--coral);
-        }
-
-        .lifecycle-item:nth-child(3) {
-            border-top-color: var(--blue);
-        }
-
-        .lifecycle-item h3 {
-            margin-bottom: 12px;
-            font-size: 1.35rem;
-        }
-
-        .lifecycle-item p {
-            margin-bottom: 0;
-            color: var(--muted);
-        }
-
-        .lifecycle-item code {
-            color: var(--ink);
-            background: #e7eee7;
-        }
-
-        html[data-theme="dark"] .lifecycle-item code {
-            background: #254c4c;
-        }
-
-        .flow {
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 0;
-            margin-top: 36px;
-            border-top: 1px solid #396666;
-            border-bottom: 1px solid #396666;
-        }
-
-        .flow-step {
-            position: relative;
-            min-height: 190px;
-            padding: 24px 20px 20px;
-            border-right: 1px solid #396666;
-        }
-
-        .flow-step:last-child {
-            border-right: 0;
-        }
-
-        .flow-step:not(:last-child)::after {
-            content: "\2192";
-            position: absolute;
-            right: -9px;
-            top: 50%;
-            z-index: 1;
-            width: 18px;
-            height: 18px;
-            color: var(--deep);
-            background: var(--yellow);
-            border-radius: 50%;
-            font-family: "Space Mono", monospace;
-            font-size: 0.75rem;
-            line-height: 18px;
-            text-align: center;
-            transform: translateY(-50%);
-        }
-
-        .flow-index {
-            display: block;
-            margin-bottom: 32px;
-            color: var(--yellow);
-            font-family: "Space Mono", monospace;
-            font-size: 0.76rem;
-            font-weight: 700;
-        }
-
-        .flow-step h3 {
-            min-height: 2.2em;
-            margin-bottom: 8px;
-            color: var(--white);
-            font-size: 1.05rem;
-        }
-
-        .flow-step p {
-            margin-bottom: 0;
-            color: #bdd2c8;
-            font-size: 0.9rem;
-        }
-
-        .targets-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-            gap: 40px;
-            align-items: start;
-        }
-
-        .targets-grid > *,
-        .development-grid > *,
-        .api-column {
-            min-width: 0;
-        }
-
-        .target-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            border-top: 1px solid var(--line);
-        }
-
-        .target-list li {
-            display: grid;
-            grid-template-columns: minmax(130px, 0.6fr) minmax(0, 1.4fr);
-            gap: 20px;
-            padding: 17px 0;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .target-list strong {
-            font-size: 0.96rem;
-        }
-
-        .target-list span {
-            color: var(--muted);
-        }
-
-        .api-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px 42px;
-        }
-
-        details {
-            padding: 17px 0;
-            border-top: 1px solid var(--line);
-        }
-
-        details:last-child,
-        .api-column details:last-child {
-            border-bottom: 1px solid var(--line);
-        }
-
-        summary {
-            cursor: pointer;
-            color: var(--ink);
-            font-weight: 700;
-        }
-
-        summary::marker {
-            color: var(--coral);
-        }
-
-        details p {
-            margin: 12px 0 0;
-            color: var(--muted);
-        }
-
-        .source-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--teal);
-            font-size: 0.74rem;
-            text-decoration-thickness: 2px;
-            text-underline-offset: 4px;
-        }
-
-        .api-note {
-            margin-bottom: 32px;
-            padding: 20px 22px;
-            color: var(--deep);
-            background: var(--yellow);
-            border-left: 5px solid var(--coral);
-        }
-
-        .api-note p {
-            margin-bottom: 0;
-        }
-
-        .api-note code {
-            overflow-wrap: anywhere;
-        }
-
-        .development-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-            gap: 48px;
-            align-items: start;
-        }
-
-        .development-grid h3 {
-            margin-bottom: 14px;
-            font-size: 1.35rem;
-        }
-
-        .link-list {
-            display: grid;
-            gap: 10px;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .link-list a {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--line);
-            color: var(--teal);
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .link-list a::after {
-            content: "\2197";
-            color: var(--coral);
-            font-family: "Space Mono", monospace;
-        }
-
-        .link-list a:hover,
-        .link-list a:focus-visible {
-            color: var(--coral);
-        }
-
-        footer {
-            padding: 34px 0 44px;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        footer .wrap {
-            display: flex;
-            justify-content: space-between;
-            gap: 24px;
-        }
-
-        footer p {
-            margin-bottom: 0;
-        }
-
-        @media (max-width: 900px) {
-            .nav-links {
-                gap: 13px;
-                font-size: 0.82rem;
-            }
-
-            h1 {
-                font-size: 4.5rem;
-            }
-
-            .section-heading,
-            .targets-grid,
-            .development-grid {
-                grid-template-columns: 1fr;
-                gap: 22px;
-            }
-
-            .flow {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-
-            .flow-step:nth-child(3) {
-                border-right: 0;
-            }
-
-            .flow-step:nth-child(3)::after {
-                display: none;
-            }
-
-            .flow-step:nth-child(4),
-            .flow-step:nth-child(5) {
-                border-top: 1px solid #396666;
-            }
-
-            .lifecycle-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .lifecycle-item {
-                min-height: auto;
-            }
-        }
-
-        @media (max-width: 620px) {
-            .wrap {
-                width: min(100% - 28px, 1180px);
-            }
-
-            .site-header {
-                position: static;
-            }
-
-            .nav {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 11px;
-                padding: 15px 0;
-            }
-
-            .nav-brand {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 12px;
-                width: 100%;
-            }
-
-            .nav-tools {
-                flex-wrap: wrap;
-                width: 100%;
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-                gap: 8px 16px;
-            }
-
-            .hero-inner {
-                padding: 58px 0 52px;
-            }
-
-            h1 {
-                font-size: 3.45rem;
-            }
-
-            .hero-lede {
-                font-size: 1.06rem;
-            }
-
-            .section {
-                padding: 58px 0;
-            }
-
-            .section-heading h2 {
-                font-size: 2.25rem;
-            }
-
-            .guide-grid,
-            .api-grid {
-                grid-template-columns: 1fr;
-                gap: 38px;
-            }
-
-            .provider-table-wrap {
-                white-space: normal;
-            }
-
-            .provider-table th,
-            .provider-table td {
-                min-width: 190px;
-            }
-
-            .flow {
-                grid-template-columns: 1fr;
-            }
-
-            .flow-step,
-            .flow-step:nth-child(4),
-            .flow-step:nth-child(5) {
-                min-height: 0;
-                border-right: 0;
-                border-top: 1px solid #396666;
-            }
-
-            .flow-step:first-child {
-                border-top: 0;
-            }
-
-            .flow-step:not(:last-child)::after,
-            .flow-step:nth-child(3)::after {
-                display: none;
-            }
-
-            .flow-index {
-                margin-bottom: 10px;
-            }
-
-            .flow-step h3 {
-                min-height: 0;
-            }
-
-            .target-list li {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-
-            footer .wrap {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-
-        @media (max-width: 300px) {
-            h1 {
-                font-size: 2.4rem;
-            }
-
-            .section-heading h2 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/site.css">
+    <script type="module" src="assets/js/site.js"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="wrap nav">
             <div class="nav-brand">
-                <a class="brand" href="#top" aria-label="PHPInjector documentation home" data-i18n-aria-label="nav.home">
+                <a class="brand" href="#top">
                     <span class="brand-mark" aria-hidden="true">&lt;&gt;</span>
-                    <span>PHPInjector <span class="version">v1.0.0</span></span>
+                    <span>PHP Injector <span class="version" data-i18n="brand.version">v1.0.0</span></span>
                 </a>
                 <div class="nav-tools">
                     <fieldset class="theme-toggle">
                         <legend class="sr-only" data-i18n="theme.label">Theme</legend>
-                        <button class="theme-button" type="button" data-theme-choice="light" aria-pressed="true" aria-label="Use light theme" data-i18n-aria-label="theme.light">
+                        <button class="theme-button" type="button" data-theme-choice="light" aria-pressed="true">
                             <span class="theme-icon" aria-hidden="true">&#9728;</span>
                             <span data-i18n="theme.light">Light</span>
                         </button>
-                        <button class="theme-button" type="button" data-theme-choice="dark" aria-pressed="false" aria-label="Use dark theme" data-i18n-aria-label="theme.dark">
+                        <button class="theme-button" type="button" data-theme-choice="dark" aria-pressed="false">
                             <span class="theme-icon" aria-hidden="true">&#9790;</span>
                             <span data-i18n="theme.dark">Dark</span>
                         </button>
@@ -1018,8 +34,8 @@
                     <label class="language-picker">
                         <span class="sr-only" data-i18n="language.label">Language</span>
                         <select id="language-select" aria-label="Language" data-i18n-aria-label="language.label">
-                            <option value="en_US" data-i18n="language.en">English (US)</option>
-                            <option value="es_ES" data-i18n="language.es">Espa&ntilde;ol (ES)</option>
+                            <option value="en" data-i18n="language.english">EN</option>
+                            <option value="es" data-i18n="language.spanish">ES</option>
                         </select>
                     </label>
                 </div>
@@ -1028,7 +44,9 @@
                 <a href="#guide" data-i18n="nav.guide">Guide</a>
                 <a href="#lifecycle" data-i18n="nav.lifecycle">Lifecycle</a>
                 <a href="#resolution" data-i18n="nav.resolution">Resolution</a>
+                <a href="#targets" data-i18n="nav.targets">Targets</a>
                 <a href="#api" data-i18n="nav.api">API</a>
+                <a href="#development" data-i18n="nav.development">Development</a>
                 <a class="nav-github" href="https://github.com/dvictorjhg/php-injector">GitHub</a>
             </nav>
         </div>
@@ -1037,22 +55,26 @@
     <main id="top">
         <section class="hero">
             <div class="wrap hero-inner">
-                <p class="eyebrow" data-i18n="hero.eyebrow">PHP 8.4+ &middot; PSR-11 &middot; reflection first</p>
-                <h1>PHPInjector</h1>
-                <p class="hero-lede" data-i18n="hero.lede">A small dependency injector for classes, methods, callables, and named values. Keep the wiring close to native PHP, then reach for the container only where it helps.</p>
+                <p class="eyebrow" data-i18n="hero.eyebrow">PHP 8.4+ / PSR-11</p>
+                <h1 data-i18n="hero.title">Injection without the fog.</h1>
+                <p class="hero-lede" data-i18n="hero.lede">A compact dependency injector for classes and callables. Reflection does the inspection; you decide the explicit inputs, providers, and lifecycle.</p>
                 <div class="hero-actions">
-                    <a class="button-link" href="#guide" data-i18n="hero.start">Start with the guide</a>
-                    <a class="button-link secondary" href="https://github.com/dvictorjhg/php-injector" data-i18n="hero.repo">View the repository</a>
+                    <a class="button-link" href="#guide" data-i18n="hero.readGuide">Read the guide</a>
+                    <a class="button-link secondary" href="https://github.com/dvictorjhg/php-injector" data-i18n="hero.github">View on GitHub</a>
                 </div>
                 <div class="quickstart">
-                    <span class="quickstart-label" data-i18n="hero.quickstart">Three lines to resolve a class</span>
-                    <pre><code>&lt;?php
+                    <span class="quickstart-label" data-i18n="hero.quickstartLabel">A useful first line</span>
+                    <pre><code data-i18n="hero.quickstartCode">&lt;?php
+
+declare(strict_types=1);
 
 use PHPInjector\DI\Injector;
 
-$injector = new Injector([Logger::class]);
-$report = Injector::inject(ReportService::class);
-$report-&gt;generate();</code></pre>
+final class MyService
+{
+}
+
+$service = Injector::inject(MyService::class);</code></pre>
                 </div>
             </div>
         </section>
@@ -1061,72 +83,58 @@ $report-&gt;generate();</code></pre>
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="guide.label">01 / first contact</span>
-                        <h2 data-i18n="guide.title">Start at the boundary.</h2>
+                        <span class="section-number" data-i18n="guide.number">01 / Start here</span>
+                        <h2 data-i18n="guide.title">Keep the graph legible.</h2>
                     </div>
-                    <p data-i18n="guide.intro">PHPInjector resolves constructor parameters through reflection. Register only the providers that need a name, an implementation, or preconfigured state; concrete classes can be resolved directly.</p>
+                    <p data-i18n="guide.lede">Register only the values that are genuinely external to the object graph. Let type declarations describe the rest.</p>
                 </div>
                 <div class="guide-grid">
                     <article class="guide-block">
-                        <h3 data-i18n="guide.install.title">Install</h3>
-                        <p data-i18n="guide.install.text">The package requires PHP 8.4 or newer and PSR-11 2.0.</p>
+                        <h3 data-i18n="guide.installTitle">Install</h3>
+                        <p data-i18n="guide.installText">The runtime has one dependency: the PSR-11 container contract.</p>
                         <pre><code>composer require dvictorjhg/php-injector</code></pre>
                     </article>
                     <article class="guide-block">
-                        <h3 data-i18n="guide.resolve.title">Resolve a class</h3>
-                        <p data-i18n="guide.resolve.text">Constructor dependencies are found from the injector's provider map.</p>
-                        <pre><code>final class ReportService
+                        <h3 data-i18n="guide.providersTitle">Providers</h3>
+                        <p data-i18n="guide.providersText">A provider is a value or factory stored under an identifier. Types are the natural default; named identifiers are useful for interfaces and configuration.</p>
+                        <pre><code data-i18n="guide.providersCode">&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+final class Logger
 {
-    public function __construct(
-        private Logger $logger,
-    ) {
-    }
 }
 
-$injector = new Injector([Logger::class]);
-$service = Injector::inject(ReportService::class);</code></pre>
-                    </article>
-                </div>
-            </div>
-        </section>
+$logger = new Logger();
+$dsn = 'mysql:host=db;dbname=app';
 
-        <section class="section mint" id="providers">
-            <div class="wrap">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-number" data-i18n="providers.label">02 / provider map</span>
-                        <h2 data-i18n="providers.title">Register only what needs a name.</h2>
-                    </div>
-                    <p data-i18n-html="providers.intro">The constructor accepts an array or a <code>Container</code>. Class strings are lazy. Objects and scalar values are returned as supplied. A child injector can fall back to a parent provider chain.</p>
+$injector = new Injector();
+$injector-&gt;addProvider(Logger::class, $logger);
+$injector-&gt;addProvider('db.dsn', $dsn);</code></pre>
+                    </article>
                 </div>
                 <div class="provider-table-wrap">
                     <table class="provider-table">
                         <thead>
                             <tr>
-                                <th data-i18n="providers.registration">Registration</th>
-                                <th data-i18n="providers.meaning">Meaning</th>
+                                <th data-i18n="guide.tableId">Identifier</th>
+                                <th data-i18n="guide.tableHow">How it is used</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Logger::class</td>
-                                <td data-i18n="providers.row.class">Register a concrete class by its own class name. It is constructed on first resolution and cached by default.</td>
+                                <td data-i18n="guide.tableTypeValue">Matches a parameter type.</td>
                             </tr>
                             <tr>
-                                <td>Formatter::class =&gt; HtmlFormatter::class</td>
-                                <td data-i18n="providers.row.alias">Map an interface or alias to a concrete class. The alias and concrete class share one cached instance.</td>
+                                <td>db.dsn</td>
+                                <td data-i18n-html="guide.tableNameValue">A parameter marked <code>#[Inject('db.dsn')]</code> receives this value.</td>
                             </tr>
                             <tr>
-                                <td>new RequestContext('cli')</td>
-                                <td data-i18n="providers.row.object">Register a prebuilt object. The injector returns the same object, preserving caller-owned state.</td>
-                            </tr>
-                            <tr>
-                                <td>Closure::class =&gt; $handler</td>
-                                <td data-i18n="providers.row.closure">Register a closure under its type for a parameter typed as Closure.</td>
-                            </tr>
-                            <tr>
-                                <td>'env' =&gt; 'production'</td>
-                                <td data-i18n-html="providers.row.value">Register a named scalar or context value for a parameter using <code>#[Inject('env')]</code>.</td>
+                                <td>Logger::class =&gt; $logger</td>
+                                <td data-i18n="guide.tableValueValue">A supplied value is returned as registered.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1134,39 +142,37 @@ $service = Injector::inject(ReportService::class);</code></pre>
                 <div class="callout">
                     <span class="callout-mark" aria-hidden="true">!</span>
                     <div>
-                        <strong data-i18n="providers.callout.title">One lifecycle detail matters.</strong>
-                        <p data-i18n-html="providers.callout.text">Every new <code>Injector</code> becomes active. Without an explicit parent, it falls back to the previously active injector, forming a provider staircase. Static calls use the active injector.</p>
+                        <strong data-i18n="guide.noteTitle">One container, one graph</strong>
+                        <p data-i18n="guide.noteText">Child injectors consult their own providers first, then walk toward the parent. A provider is never silently pulled from an unrelated global container.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="section" id="lifecycle">
+        <section class="section mint" id="lifecycle">
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="lifecycle.label">03 / object identity</span>
-                        <h2 data-i18n="lifecycle.title">Choose the owner of identity.</h2>
+                        <span class="section-number" data-i18n="lifecycle.number">02 / Lifecycle</span>
+                        <h2 data-i18n="lifecycle.title">Choose where identity lives.</h2>
                     </div>
-                    <p data-i18n="lifecycle.intro">There is one default and two deliberate escape hatches. The injector caches ordinary automatic construction; a class can opt out, or own construction itself.</p>
+                    <p data-i18n="lifecycle.lede">Most objects should be transient. Mark the few that own identity or expensive state as singletons, and opt out locally when a fresh object matters.</p>
                 </div>
                 <div class="lifecycle-grid">
                     <article class="lifecycle-item">
-                        <h3 data-i18n="lifecycle.default.title">Default cache</h3>
-                        <p data-i18n="lifecycle.default.text">Automatically constructed classes are cached in the active injector. A newly constructed injector has its own cache and can fall back through the previous injector staircase.</p>
+                        <h3 data-i18n="lifecycle.transientTitle">Transient</h3>
+                        <p data-i18n="lifecycle.transientText">The default. Each call creates a fresh instance unless a concrete provider already exists.</p>
                     </article>
                     <article class="lifecycle-item">
-                        <h3><code>#[Transient]</code></h3>
-                        <p data-i18n="lifecycle.transient.text">Mark a class to skip injector-managed cache writes and receive a fresh automatic construction. An explicitly registered object and a class's own factory still win.</p>
+                        <h3 data-i18n="lifecycle.singletonTitle">Singleton</h3>
+                        <p data-i18n-html="lifecycle.singletonText">Implement <code>Singleton</code> to cache the concrete class in the active injector.</p>
                     </article>
                     <article class="lifecycle-item">
-                        <h3><code>Singleton</code></h3>
-                        <p data-i18n-html="lifecycle.singleton.text">Implement <code>getInstance()</code> when the class must control creation. The injector delegates to that method instead of calling the constructor.</p>
+                        <h3 data-i18n="lifecycle.overrideTitle">Override</h3>
+                        <p data-i18n-html="lifecycle.overrideText">Add <code>#[Transient]</code> to a singleton class when one injection point needs a fresh instance.</p>
                     </article>
                 </div>
-                <pre style="margin-top: 30px;"><code>use PHPInjector\DI\Attributes\Transient;
-
-#[Transient]
+                <pre class="lifecycle-code"><code>#[Transient]
 final class RequestStamp
 {
 }
@@ -1182,71 +188,129 @@ $first === $second; // false</code></pre>
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="resolution.label">04 / parameter resolution</span>
-                        <h2 data-i18n="resolution.title">Read the lookup chain.</h2>
+                        <span class="section-number" data-i18n="resolution.number">03 / Resolution</span>
+                        <h2 data-i18n="resolution.title">Every parameter has a trail.</h2>
                     </div>
-                    <p class="muted" data-i18n="resolution.intro">For every constructor, method, closure, or function parameter, the injector stops at the first matching source. Explicit values are the strongest signal.</p>
+                    <p class="muted" data-i18n="resolution.lede">The resolver follows one ordered path. The first matching source wins, which keeps a complex graph inspectable in a debugger or a code review.</p>
                 </div>
-                <div class="flow" aria-label="Parameter resolution order" data-i18n-aria-label="resolution.aria">
-                    <article class="flow-step">
-                        <span class="flow-index">01</span>
-                        <h3 data-i18n="resolution.explicit.title">Explicit args</h3>
-                        <p data-i18n="resolution.explicit.text">Type key, parameter name, then numeric position.</p>
-                    </article>
-                    <article class="flow-step">
-                        <span class="flow-index">02</span>
-                        <h3><code>#[Inject]</code></h3>
-                        <p data-i18n="resolution.attribute.text">Use the named provider ID from the parameter attribute.</p>
-                    </article>
-                    <article class="flow-step">
-                        <span class="flow-index">03</span>
-                        <h3 data-i18n="resolution.typed.title">Typed provider</h3>
-                        <p data-i18n="resolution.typed.text">Look up a non-builtin named class type.</p>
-                    </article>
-                    <article class="flow-step">
-                        <span class="flow-index">04</span>
-                        <h3 data-i18n="resolution.default.title">PHP default</h3>
-                        <p data-i18n="resolution.default.text">Use the parameter default when no provider matches.</p>
-                    </article>
-                    <article class="flow-step">
-                        <span class="flow-index">05</span>
-                        <h3 data-i18n="resolution.exception.title">Exception</h3>
-                        <p data-i18n="resolution.exception.text">Missing required values raise InjectorException.</p>
-                    </article>
+                <div class="resolution-diagram">
+                    <div class="resolution-flow" aria-label="Parameter resolution order" data-i18n-aria-label="resolution.aria">
+                        <article class="resolution-stage resolution-stage-explicit">
+                            <div class="resolution-stage-marker">
+                                <span class="resolution-index">01</span>
+                                <span class="resolution-kind" data-i18n="resolution.first">first</span>
+                            </div>
+                            <div>
+                                <div class="resolution-stage-head">
+                                    <h3 data-i18n="resolution.stageExplicit">Explicit arguments</h3>
+                                    <span class="resolution-stage-tag" data-i18n="resolution.stop">stop</span>
+                                </div>
+                                <p data-i18n-html="resolution.stageExplicitText">The optional second argument to <code>Injector::inject()</code> is checked first. Keys can be a type, parameter name, or numeric position.</p>
+                                <ol class="resolution-choices">
+                                    <li class="resolution-choice">
+                                        <span class="resolution-choice-index">01</span>
+                                        <code>$args[Logger::class]</code>
+                                        <p data-i18n="resolution.explicitType">type</p>
+                                    </li>
+                                    <li class="resolution-choice">
+                                        <span class="resolution-choice-index">02</span>
+                                        <code>$args['logger']</code>
+                                        <p data-i18n="resolution.explicitName">name</p>
+                                    </li>
+                                    <li class="resolution-choice">
+                                        <span class="resolution-choice-index">03</span>
+                                        <code>$args[0]</code>
+                                        <p data-i18n="resolution.explicitPosition">position</p>
+                                    </li>
+                                </ol>
+                                <div class="resolution-args-context">
+                                    <strong data-i18n="resolution.argsTitle">Contextual input</strong>
+                                    <p data-i18n-html="resolution.argsText"><code>$args</code> belongs to this call only; it is separate from the injector's persistent provider map.</p>
+                                    <pre><code>&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+$args = ['string' =&gt; 'cache'];
+$length = Injector::inject('strlen', $args);
+echo $length;</code></pre>
+                                </div>
+                            </div>
+                        </article>
+                        <div class="resolution-connector"><span data-i18n="resolution.next">next</span></div>
+                        <article class="resolution-stage resolution-stage-attribute">
+                            <div class="resolution-stage-marker">
+                                <span class="resolution-index">02</span>
+                                <span class="resolution-kind" data-i18n="resolution.fallback">fallback</span>
+                            </div>
+                            <div>
+                                <div class="resolution-stage-head">
+                                    <h3 data-i18n="resolution.attribute">#[Inject('id')]</h3>
+                                    <span class="resolution-stage-tag" data-i18n="resolution.chain">chain</span>
+                                </div>
+                                <p data-i18n="resolution.attributeText">A parameter-level identifier selects a named provider after no explicit argument matches.</p>
+                            </div>
+                        </article>
+                        <div class="resolution-connector"><span data-i18n="resolution.next">next</span></div>
+                        <article class="resolution-stage resolution-stage-typed">
+                            <div class="resolution-stage-marker">
+                                <span class="resolution-index">03</span>
+                                <span class="resolution-kind" data-i18n="resolution.type">type</span>
+                            </div>
+                            <div>
+                                <div class="resolution-stage-head">
+                                    <h3 data-i18n="resolution.typed">Typed provider</h3>
+                                    <span class="resolution-stage-tag" data-i18n="resolution.chain">chain</span>
+                                </div>
+                                <p data-i18n="resolution.typedText">The declared class or interface name is looked up in the active injector and then its parent chain.</p>
+                            </div>
+                        </article>
+                        <div class="resolution-connector"><span data-i18n="resolution.next">next</span></div>
+                        <article class="resolution-stage resolution-stage-default">
+                            <div class="resolution-stage-marker">
+                                <span class="resolution-index">04</span>
+                                <span class="resolution-kind" data-i18n="resolution.fallback">fallback</span>
+                            </div>
+                            <div>
+                                <div class="resolution-stage-head">
+                                    <h3 data-i18n="resolution.default">PHP default</h3>
+                                    <span class="resolution-stage-tag" data-i18n="resolution.stop">stop</span>
+                                </div>
+                                <p data-i18n="resolution.defaultText">A declared default value is used when no explicit value, attribute, or typed provider is available.</p>
+                            </div>
+                        </article>
+                        <div class="resolution-connector"><span data-i18n="resolution.next">next</span></div>
+                        <article class="resolution-stage resolution-stage-exception">
+                            <div class="resolution-stage-marker">
+                                <span class="resolution-index">05</span>
+                                <span class="resolution-kind" data-i18n="resolution.error">error</span>
+                            </div>
+                            <div>
+                                <div class="resolution-stage-head">
+                                    <h3 data-i18n="resolution.exception">InjectorException</h3>
+                                    <span class="resolution-stage-tag" data-i18n="resolution.throw">throw</span>
+                                </div>
+                                <p data-i18n="resolution.exceptionText">A required parameter with no source fails loudly. There is no hidden fallback or service locator detour.</p>
+                            </div>
+                        </article>
+                    </div>
+                    <aside class="resolution-provider-lane">
+                        <span class="resolution-lane-label">02 + 03</span>
+                        <h3 data-i18n="resolution.providerLane">Provider search</h3>
+                        <p data-i18n="resolution.providerLaneText">The current injector is checked first, followed by each parent.</p>
+                        <div class="provider-chain">
+                            <span class="provider-node" data-i18n="resolution.providerCurrent">Current injector</span>
+                            <span class="provider-chain-arrow" aria-hidden="true">&#8595;</span>
+                            <span class="provider-node" data-i18n="resolution.providerParent">Parent injector</span>
+                            <span class="provider-chain-arrow" aria-hidden="true">&#8595;</span>
+                            <span class="provider-node" data-i18n="resolution.providerEnd">No provider</span>
+                        </div>
+                        <p class="resolution-provider-footnote" data-i18n="resolution.providerFootnote">This order is also used while resolving providers whose values are themselves classes or callables.</p>
+                    </aside>
                 </div>
-                <p class="muted" style="margin: 24px 0 0;" data-i18n="resolution.note">Argument arrays must use one key style per call. Mixing integer and string keys is rejected so positional and named intent cannot be confused.</p>
-                <p class="muted" style="margin: 12px 0 0;" data-i18n="resolution.types">Automatic type lookup supports registered non-builtin named types, including classes, interfaces, abstract classes, enum instances, nullable named types, and Closure providers. Built-in types, callable, untyped parameters, and union or intersection types require an explicit argument or #[Inject('id')]. Variadics accept zero or more values.</p>
-                <p style="margin: 20px 0 0;" data-i18n="resolution.example">A named Closure provider and a list-valued class provider can be used together:</p>
-                <pre style="margin-top: 16px;"><code>use PHPInjector\DI\Injector;
-
-final class Logger
-{
-    public function __construct(public string $channel)
-    {
-    }
-}
-
-final class ReportBatch
-{
-    public static function channels(Logger ...$loggers): string
-    {
-        return implode(',', array_map(
-            static fn (Logger $logger): string =&gt; $logger-&gt;channel,
-            $loggers,
-        ));
-    }
-}
-
-$injector = new Injector([
-    \Closure::class =&gt; static fn (string $value): string =&gt; strtoupper($value),
-    Logger::class =&gt; [new Logger('api'), new Logger('worker')],
-]);
-
-$formatted = Injector::inject(static fn (\Closure $format): string =&gt; $format('ready'));
-$channels = Injector::inject([ReportBatch::class, 'channels']);
-
-echo $formatted . PHP_EOL;
-echo $channels;</code></pre>
+                <p class="muted resolution-note" data-i18n="resolution.note">One rule of thumb: make the ordinary path obvious, then use explicit arguments or attributes only where the graph needs a deliberate exception.</p>
+                <p class="muted resolution-types" data-i18n="resolution.types">Supported targets include class names, object/class method arrays, callable strings, closures, and invokable objects.</p>
             </div>
         </section>
 
@@ -1254,35 +318,48 @@ echo $channels;</code></pre>
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="targets.label">05 / injection targets</span>
-                        <h2 data-i18n="targets.title">More than constructors.</h2>
+                        <span class="section-number" data-i18n="targets.number">04 / Targets</span>
+                        <h2 data-i18n="targets.title">Reflect the thing you already have.</h2>
                     </div>
-                    <p data-i18n="targets.intro">The same parameter resolver works across class construction and callable invocation. Method arrays accept either a class name or an existing object.</p>
+                    <p data-i18n="targets.lede">The public entry point accepts the common PHP callable shapes, then routes each one through the same parameter resolver.</p>
                 </div>
                 <div class="targets-grid">
                     <ul class="target-list">
                         <li>
-                            <strong data-i18n="targets.class.title">Class name</strong>
-                            <span><code>ReportService::class</code> <span data-i18n="targets.class.text">resolves its constructor.</span></span>
+                            <strong data-i18n="targets.class">Class string</strong>
+                            <span data-i18n="targets.classText">Constructs the class and resolves its constructor.</span>
                         </li>
                         <li>
-                            <strong data-i18n="targets.method.title">Method array</strong>
-                            <span><code>[ReportController::class, 'show']</code> <span data-i18n="targets.method.text">or an object target.</span></span>
+                            <strong data-i18n="targets.method">Method array</strong>
+                            <span data-i18n="targets.methodText">Invokes an instance or static method with resolved parameters.</span>
                         </li>
                         <li>
-                            <strong data-i18n="targets.callable.title">Callable string</strong>
-                            <span><code>'ReportJobs::warm'</code> <span data-i18n="targets.callable.text">or a global function such as</span> <code>'strlen'</code>.</span>
+                            <strong data-i18n="targets.callable">Callable string</strong>
+                            <span data-i18n-html="targets.callableText">Reflects a function name such as <code>strlen</code>.</span>
                         </li>
                         <li>
-                            <strong data-i18n="targets.closure.title">Closure</strong>
-                            <span data-i18n="targets.closure.text">A closure receives providers and explicit values by parameter.</span>
+                            <strong data-i18n="targets.closure">Closure</strong>
+                            <span data-i18n="targets.closureText">Reflects and invokes an inline function.</span>
                         </li>
                         <li>
-                            <strong data-i18n="targets.invokable.title">Invokable object</strong>
-                            <span>An object with <code>__invoke()</code> <span data-i18n="targets.invokable.text">is resolved as a callable.</span></span>
+                            <strong data-i18n="targets.invokable">Invokable object</strong>
+                            <span data-i18n-html="targets.invokableText">Uses the object's <code>__invoke</code> method.</span>
                         </li>
                     </ul>
-                    <pre><code>final class ReportJobs
+                    <pre><code>&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+final class Logger
+{
+    public function __construct(public string $channel = 'app')
+    {
+    }
+}
+
+final class ReportJobs
 {
     public static function warm(Logger $logger): string
     {
@@ -1290,11 +367,23 @@ echo $channels;</code></pre>
     }
 }
 
-Injector::inject('ReportJobs::warm');
-Injector::inject(
-    static fn (Logger $logger): string =&gt; $logger-&gt;channel,
-);
-Injector::inject('strlen', ['string' =&gt; 'cache']);</code></pre>
+$injector = new Injector([Logger::class]);
+echo Injector::inject('ReportJobs::warm') . PHP_EOL;
+echo Injector::inject(static fn (Logger $logger): string =&gt; $logger-&gt;channel);</code></pre>
+                </div>
+                <div class="targets-variadic">
+                    <h3 data-i18n="targets.variadicTitle">Variadics stay positional</h3>
+                    <p data-i18n-html="targets.variadicText">For <code>function sum(int ...$values)</code>, numeric values from the variadic position onward are collected and passed as separate arguments.</p>
+                    <pre><code data-i18n="targets.variadicCode">&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+
+echo Injector::inject(
+    fn (int ...$values): int =&gt; array_sum($values),
+    [2, 3, 5],
+);</code></pre>
                 </div>
             </div>
         </section>
@@ -1303,57 +392,57 @@ Injector::inject('strlen', ['string' =&gt; 'cache']);</code></pre>
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="api.label">06 / public API</span>
-                        <h2 data-i18n="api.title">Small surface, explicit edges.</h2>
+                        <span class="section-number" data-i18n="api.number">05 / API</span>
+                        <h2 data-i18n="api.title">Small surface, sharp edges.</h2>
                     </div>
-                    <p data-i18n="api.intro">Use the API map below when you need the exact ownership boundary. The source links point directly to the implementation on GitHub.</p>
+                    <p data-i18n="api.lede">The API is intentionally short. The useful detail is in the contracts between the injector, its providers, and reflection.</p>
                 </div>
                 <div class="api-note">
-                    <p><strong data-i18n="api.note.title">Remember:</strong> <span data-i18n-html="api.note.text">The latest constructed <code>Injector</code> is active. Use <code>Injector::inject()</code> or <code>PHPInjector\DI\inject()</code> to resolve through it and its parent staircase.</span></p>
+                    <p><strong data-i18n="api.callTitle">Injector::inject</strong> <span data-i18n="api.callText">Resolve a class, callable, closure, method array, or invokable object. The second argument supplies per-call values.</span></p>
                 </div>
                 <div class="api-grid">
                     <div class="api-column">
                         <details open>
-                            <summary><code>Injector::__construct()</code></summary>
-                            <p data-i18n-html="api.construct.text">Accepts an array or <code>Container</code> of providers and an optional parent injector. Without an explicit parent, the previous active injector becomes the new injector's parent and the new instance becomes active.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php">src/DI/Injector.php</a>
-                        </details>
-                        <details open>
-                            <summary><code>Injector::inject()</code></summary>
-                            <p data-i18n="api.inject.text">Statically resolves classes, method targets, closures, functions, callable strings, and invokable objects through the active injector.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php">src/DI/Injector.php</a>
+                            <summary><code>Injector::addProvider()</code></summary>
+                            <p data-i18n="api.addProviderText">Store a value, class string, or callable factory under a string identifier.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
                         </details>
                         <details>
-                            <summary><code>Injector-&gt;addProvider()</code></summary>
-                            <p data-i18n="api.add.text">Stores or replaces a provider by explicit string ID. Class-string providers remain lazy until resolution.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php">src/DI/Injector.php</a>
+                            <summary><code>Injector::getProvider()</code></summary>
+                            <p data-i18n="api.getProviderText">Read a provider from the current injector or its parent chain. Missing identifiers throw a container exception.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
+                        </details>
+                        <details>
+                            <summary><code>Injector::hasProvider()</code></summary>
+                            <p data-i18n="api.hasProviderText">Check whether an identifier exists in the current injector or its parent chain.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
                         </details>
                         <details>
                             <summary><code>PHPInjector\DI\inject()</code></summary>
-                            <p data-i18n-html="api.function.text">Global function entry point for <code>Injector::inject()</code>, using the active injector.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/functions.php">src/DI/functions.php</a>
+                            <p data-i18n-html="api.functionText">Global function entry point for <code>Injector::inject()</code>.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/functions.php" data-i18n="api.source">Source</a>
                         </details>
                     </div>
                     <div class="api-column">
                         <details open>
                             <summary><code>Container</code></summary>
-                            <p data-i18n-html="api.container.text">PSR-11-compatible storage with <code>has()</code>, <code>get()</code>, <code>set()</code>, <code>unset()</code>, <code>count()</code>, and iteration.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/Container/Container.php">src/Container/Container.php</a>
+                            <p data-i18n="api.containerText">Use the PSR-11 container directly when a provider map is the right abstraction. It supports get, has, and set.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/Container/Container.php" data-i18n="api.source">Source</a>
                         </details>
                         <details open>
                             <summary><code>#[Inject('id')]</code></summary>
-                            <p data-i18n="api.injectAttribute.text">Parameter attribute for selecting a named provider, especially useful for scalar or contextual values.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Inject.php">src/DI/Attributes/Inject.php</a>
+                            <p data-i18n="api.injectAttributeText">Annotate one parameter with a named provider identifier.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Inject.php" data-i18n="api.source">Source</a>
                         </details>
                         <details>
                             <summary><code>#[Transient]</code></summary>
-                            <p data-i18n="api.transient.text">Class attribute that opts automatic construction out of injector-managed caching.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Transient.php">src/DI/Attributes/Transient.php</a>
+                            <p data-i18n="api.transientAttributeText">Override singleton caching for one class declaration.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Transient.php" data-i18n="api.source">Source</a>
                         </details>
                         <details>
                             <summary><code>Singleton</code></summary>
-                            <p data-i18n-html="api.singleton.text">Contract requiring a public static <code>getInstance(): self</code> factory for class-owned identity.</p>
-                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/Contracts/Singleton.php">src/Contracts/Singleton.php</a>
+                            <p data-i18n="api.singletonText">Implement the marker interface to cache the constructed concrete instance.</p>
+                            <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/Contracts/Singleton.php" data-i18n="api.source">Source</a>
                         </details>
                     </div>
                 </div>
@@ -1364,29 +453,25 @@ Injector::inject('strlen', ['string' =&gt; 'cache']);</code></pre>
             <div class="wrap">
                 <div class="section-heading">
                     <div>
-                        <span class="section-number" data-i18n="development.label">07 / working locally</span>
-                        <h2 data-i18n="development.title">Keep the feedback loop short.</h2>
+                        <span class="section-number" data-i18n="development.number">06 / Development</span>
+                        <h2 data-i18n="development.title">Read the source. Run the checks.</h2>
                     </div>
-                    <p data-i18n="development.intro">Composer scripts are the repository's source of truth for static analysis, tests, coverage, and package validation. CI runs the same checks on PHP 8.4 and 8.5 and publishes coverage to Codecov.</p>
+                    <p data-i18n="development.lede">This project keeps its feedback loop deliberately plain: Composer scripts, strict static analysis, and a focused unit suite.</p>
                 </div>
                 <div class="development-grid">
                     <div>
-                        <h3 data-i18n="development.verify">Verify a change</h3>
-                        <pre><code>composer install
-composer validate --strict
-composer analyse
+                        <h3 data-i18n="development.commandsTitle">Commands</h3>
+                        <pre><code>composer analyse
 composer test
-composer test:coverage
-composer coverage:check</code></pre>
+composer test:coverage</code></pre>
                     </div>
                     <div>
-                        <h3 data-i18n="development.read">Read the rest</h3>
+                        <h3 data-i18n="development.linksTitle">Project links</h3>
                         <ul class="link-list">
-                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/README.md" data-i18n="development.readme">Full README examples</a></li>
-                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/CONTRIBUTING.md" data-i18n="development.contributing">Contribution workflow</a></li>
+                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/README.md" data-i18n="development.readme">README</a></li>
                             <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/CHANGELOG.md" data-i18n="development.changelog">Changelog</a></li>
-                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/SECURITY.md" data-i18n="development.security">Security reporting</a></li>
-                            <li><a href="https://github.com/dvictorjhg/php-injector/actions/workflows/ci.yml" data-i18n="development.ci">CI and coverage</a></li>
+                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/CONTRIBUTING.md" data-i18n="development.contributing">Contributing</a></li>
+                            <li><a href="https://github.com/dvictorjhg/php-injector/blob/main/SECURITY.md" data-i18n="development.security">Security policy</a></li>
                         </ul>
                     </div>
                 </div>
@@ -1396,289 +481,9 @@ composer coverage:check</code></pre>
 
     <footer>
         <div class="wrap">
-            <p data-i18n="footer.license">PHPInjector is open source under Apache-2.0.</p>
-            <p><a href="https://github.com/dvictorjhg/php-injector">github.com/dvictorjhg/php-injector</a></p>
+            <p data-i18n="footer.text">PHP Injector / reflection-first dependency injection</p>
+            <p><a href="https://github.com/dvictorjhg/php-injector" data-i18n="footer.github">GitHub repository</a></p>
         </div>
     </footer>
-
-    <script>
-        (() => {
-            const root = document.documentElement;
-            const themeButtons = document.querySelectorAll('[data-theme-choice]');
-
-            const applyTheme = (theme, persist = true) => {
-                const nextTheme = theme === 'dark' ? 'dark' : 'light';
-                root.dataset.theme = nextTheme;
-
-                themeButtons.forEach((button) => {
-                    button.setAttribute('aria-pressed', String(button.dataset.themeChoice === nextTheme));
-                });
-
-                if (persist) {
-                    try {
-                        localStorage.setItem('phpinjector-theme', nextTheme);
-                    } catch {}
-                }
-            };
-
-            themeButtons.forEach((button) => {
-                button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
-            });
-
-            applyTheme(root.dataset.theme || 'light', false);
-        })();
-
-        (() => {
-            const translations = {
-                en_US: {
-                    'page.title': 'PHPInjector | Dependency injection for modern PHP',
-                    'page.description': 'PHPInjector documentation: reflection-based dependency injection and PSR-11 provider storage for PHP 8.4+.',
-                    'nav.home': 'PHPInjector documentation home',
-                    'nav.sections': 'Documentation sections',
-                    'nav.guide': 'Guide',
-                    'nav.lifecycle': 'Lifecycle',
-                    'nav.resolution': 'Resolution',
-                    'nav.api': 'API',
-                    'theme.label': 'Theme',
-                    'theme.light': 'Light',
-                    'theme.dark': 'Dark',
-                    'language.label': 'Language',
-                    'language.en': 'English (US)',
-                    'language.es': 'Espa\u00f1ol (ES)',
-                    'hero.eyebrow': 'PHP 8.4+ \u00b7 PSR-11 \u00b7 reflection first',
-                    'hero.lede': 'A small dependency injector for classes, methods, callables, and named values. Keep the wiring close to native PHP, then reach for the container only where it helps.',
-                    'hero.start': 'Start with the guide',
-                    'hero.repo': 'View the repository',
-                    'hero.quickstart': 'Three lines to resolve a class',
-                    'guide.label': '01 / first contact',
-                    'guide.title': 'Start at the boundary.',
-                    'guide.intro': 'PHPInjector resolves constructor parameters through reflection. Register only the providers that need a name, an implementation, or preconfigured state; concrete classes can be resolved directly.',
-                    'guide.install.title': 'Install',
-                    'guide.install.text': 'The package requires PHP 8.4 or newer and PSR-11 2.0.',
-                    'guide.resolve.title': 'Resolve a class',
-                    'guide.resolve.text': "Constructor dependencies are found from the injector's provider map.",
-                    'providers.label': '02 / provider map',
-                    'providers.title': 'Register only what needs a name.',
-                    'providers.intro': 'The constructor accepts an array or a <code>Container</code>. Class strings are lazy. Objects and scalar values are returned as supplied. A child injector can fall back to a parent provider chain.',
-                    'providers.registration': 'Registration',
-                    'providers.meaning': 'Meaning',
-                    'providers.row.class': 'Register a concrete class by its own class name. It is constructed on first resolution and cached by default.',
-                    'providers.row.alias': 'Map an interface or alias to a concrete class. The alias and concrete class share one cached instance.',
-                    'providers.row.object': 'Register a prebuilt object. The injector returns the same object, preserving caller-owned state.',
-                    'providers.row.closure': 'Register a closure under its type for a parameter typed as Closure.',
-                    'providers.row.value': "Register a named scalar or context value for a parameter using <code>#[Inject('env')]</code>.",
-                    'providers.callout.title': 'One lifecycle detail matters.',
-                    'providers.callout.text': 'Every new <code>Injector</code> becomes active. Without an explicit parent, it falls back to the previously active injector, forming a provider staircase. Static calls use the active injector.',
-                    'lifecycle.label': '03 / object identity',
-                    'lifecycle.title': 'Choose the owner of identity.',
-                    'lifecycle.intro': 'There is one default and two deliberate escape hatches. The injector caches ordinary automatic construction; a class can opt out, or own construction itself.',
-                    'lifecycle.default.title': 'Default cache',
-                    'lifecycle.default.text': 'Automatically constructed classes are cached in the active injector. A newly constructed injector has its own cache and can fall back through the previous injector staircase.',
-                    'lifecycle.transient.text': 'Mark a class to skip injector-managed cache writes and receive a fresh automatic construction. An explicitly registered object and a class\'s own factory still win.',
-                    'lifecycle.singleton.text': 'Implement <code>getInstance()</code> when the class must control creation. The injector delegates to that method instead of calling the constructor.',
-                    'resolution.label': '04 / parameter resolution',
-                    'resolution.title': 'Read the lookup chain.',
-                    'resolution.intro': 'For every constructor, method, closure, or function parameter, the injector stops at the first matching source. Explicit values are the strongest signal.',
-                    'resolution.aria': 'Parameter resolution order',
-                    'resolution.explicit.title': 'Explicit args',
-                    'resolution.explicit.text': 'Type key, parameter name, then numeric position.',
-                    'resolution.attribute.text': 'Use the named provider ID from the parameter attribute.',
-                    'resolution.typed.title': 'Typed provider',
-                    'resolution.typed.text': 'Look up a registered provider for a non-builtin named type.',
-                    'resolution.default.title': 'PHP default',
-                    'resolution.default.text': 'Use the parameter default when no provider matches.',
-                    'resolution.exception.title': 'Exception',
-                    'resolution.exception.text': 'Missing required values raise InjectorException.',
-                    'resolution.note': 'Argument arrays must use one key style per call. Mixing integer and string keys is rejected so positional and named intent cannot be confused.',
-                    'resolution.types': 'Automatic type lookup supports registered non-builtin named types, including classes, interfaces, abstract classes, enum instances, nullable named types, and Closure providers. Built-in types, callable, untyped parameters, and union or intersection types require an explicit argument or #[Inject(\'id\')]. Variadics accept zero or more values.',
-                    'resolution.example': 'A named Closure provider and a list-valued class provider can be used together:',
-                    'targets.label': '05 / injection targets',
-                    'targets.title': 'More than constructors.',
-                    'targets.intro': 'The same parameter resolver works across class construction and callable invocation. Method arrays accept either a class name or an existing object.',
-                    'targets.class.title': 'Class name',
-                    'targets.class.text': 'resolves its constructor.',
-                    'targets.method.title': 'Method array',
-                    'targets.method.text': 'or an object target.',
-                    'targets.callable.title': 'Callable string',
-                    'targets.callable.text': 'or a global function such as',
-                    'targets.closure.title': 'Closure',
-                    'targets.closure.text': 'A closure receives providers and explicit values by parameter.',
-                    'targets.invokable.title': 'Invokable object',
-                    'targets.invokable.text': 'is resolved as a callable.',
-                    'api.label': '06 / public API',
-                    'api.title': 'Small surface, explicit edges.',
-                    'api.intro': 'Use the API map below when you need the exact ownership boundary. The source links point directly to the implementation on GitHub.',
-                    'api.note.title': 'Remember:',
-                    'api.note.text': 'The latest constructed <code>Injector</code> is active. Use <code>Injector::inject()</code> or <code>PHPInjector\\DI\\inject()</code> to resolve through it and its parent staircase.',
-                    'api.construct.text': "Accepts an array or <code>Container</code> of providers and an optional parent injector. Without an explicit parent, the previous active injector becomes the new injector's parent and the new instance becomes active.",
-                    'api.inject.text': 'Statically resolves classes, method targets, closures, functions, callable strings, and invokable objects through the active injector.',
-                    'api.function.text': 'Global function entry point for <code>Injector::inject()</code>, using the active injector.',
-                    'api.add.text': 'Stores or replaces a provider by explicit string ID. Class-string providers remain lazy until resolution.',
-                    'api.container.text': 'PSR-11-compatible storage with <code>has()</code>, <code>get()</code>, <code>set()</code>, <code>unset()</code>, <code>count()</code>, and iteration.',
-                    'api.injectAttribute.text': 'Parameter attribute for selecting a named provider, especially useful for scalar or contextual values.',
-                    'api.transient.text': 'Class attribute that opts automatic construction out of injector-managed caching.',
-                    'api.singleton.text': 'Contract requiring a public static <code>getInstance(): self</code> factory for class-owned identity.',
-                    'development.label': '07 / working locally',
-                    'development.title': 'Keep the feedback loop short.',
-                    'development.intro': "Composer scripts are the repository's source of truth for static analysis, tests, coverage, and package validation. CI runs the same checks on PHP 8.4 and 8.5 and publishes coverage to Codecov.",
-                    'development.verify': 'Verify a change',
-                    'development.read': 'Read the rest',
-                    'development.readme': 'Full README examples',
-                    'development.contributing': 'Contribution workflow',
-                    'development.changelog': 'Changelog',
-                    'development.security': 'Security reporting',
-                    'development.ci': 'CI and coverage',
-                    'footer.license': 'PHPInjector is open source under Apache-2.0.'
-                },
-                es_ES: {
-                    'page.title': 'PHPInjector | Inyecci\u00f3n de dependencias para PHP moderno',
-                    'page.description': 'Documentaci\u00f3n de PHPInjector: inyecci\u00f3n de dependencias basada en reflexi\u00f3n y gesti\u00f3n de proveedores compatible con PSR-11 para PHP 8.4+.',
-                    'nav.home': 'Inicio de la documentaci\u00f3n de PHPInjector',
-                    'nav.sections': 'Secciones de la documentaci\u00f3n',
-                    'nav.guide': 'Gu\u00eda',
-                    'nav.lifecycle': 'Ciclo de vida',
-                    'nav.resolution': 'Resoluci\u00f3n',
-                    'nav.api': 'API',
-                    'theme.label': 'Tema',
-                    'theme.light': 'Claro',
-                    'theme.dark': 'Oscuro',
-                    'language.label': 'Idioma',
-                    'language.en': 'Ingl\u00e9s (EE. UU.)',
-                    'language.es': 'Espa\u00f1ol (ES)',
-                    'hero.eyebrow': 'PHP 8.4+ \u00b7 PSR-11 \u00b7 reflexi\u00f3n como base',
-                    'hero.lede': 'Un inyector de dependencias peque\u00f1o para clases, m\u00e9todos, callables y valores con nombre. Mant\u00e9n la configuraci\u00f3n cerca del PHP nativo y recurre al contenedor solo cuando resulte \u00fatil.',
-                    'hero.start': 'Empieza por la gu\u00eda',
-                    'hero.repo': 'Ver el repositorio',
-                    'hero.quickstart': 'Tres l\u00edneas para resolver una clase',
-                    'guide.label': '01 / punto de partida',
-                    'guide.title': 'Empieza por el punto de entrada.',
-                    'guide.intro': 'PHPInjector resuelve los par\u00e1metros del constructor mediante reflexi\u00f3n. Registra solo los proveedores que necesiten un nombre, una implementaci\u00f3n o estado preconfigurado; las clases concretas pueden resolverse directamente.',
-                    'guide.install.title': 'Instala',
-                    'guide.install.text': 'El paquete requiere PHP 8.4 o superior y PSR-11 2.0.',
-                    'guide.resolve.title': 'Resuelve una clase',
-                    'guide.resolve.text': 'Las dependencias del constructor se obtienen del mapa de proveedores del inyector.',
-                    'providers.label': '02 / mapa de proveedores',
-                    'providers.title': 'Registra solo lo que necesite un identificador.',
-                    'providers.intro': 'El constructor acepta un array o un <code>Container</code>. Las cadenas que representan clases se resuelven de forma diferida. Los objetos y valores escalares se devuelven tal cual. Un inyector hijo puede recurrir a la cadena de proveedores del padre.',
-                    'providers.row.closure': 'Registra una closure con la clave Closure::class para un par\u00e1metro de tipo Closure.',
-                    'providers.registration': 'Registro',
-                    'providers.meaning': '\u00bfQu\u00e9 significa?',
-                    'providers.row.class': 'Registra una clase concreta con su nombre de clase. Se construye la primera vez que se resuelve y se guarda en cach\u00e9 por defecto.',
-                    'providers.row.alias': 'Relaciona una interfaz o un alias con una clase concreta. El alias y la clase concreta comparten la misma instancia en cach\u00e9.',
-                    'providers.row.object': 'Registra un objeto ya construido. El inyector devuelve ese mismo objeto y conserva el estado que ya ten\u00eda.',
-                    'providers.row.value': "Registra un valor escalar o contextual con nombre para un par\u00e1metro mediante <code>#[Inject('env')]</code>.",
-                    'providers.callout.title': 'Hay un detalle importante sobre el ciclo de vida.',
-                    'providers.callout.text': 'Cada nuevo <code>Injector</code> pasa a ser el activo. Sin un padre expl\u00edcito, recurre al inyector activo anterior y forma una escalera de proveedores. Las llamadas est\u00e1ticas utilizan el inyector activo.',
-                    'lifecycle.label': '03 / identidad de objetos',
-                    'lifecycle.title': 'Elige qui\u00e9n controla la identidad.',
-                    'lifecycle.intro': 'Hay un comportamiento predeterminado y dos formas deliberadas de apartarse de \u00e9l. El inyector almacena en cach\u00e9 las construcciones autom\u00e1ticas normales; una clase puede desactivar ese comportamiento o asumir el control de su propia construcci\u00f3n.',
-                    'lifecycle.default.title': 'Cach\u00e9 predeterminada',
-                    'lifecycle.default.text': 'Las clases construidas autom\u00e1ticamente se guardan en la cach\u00e9 del inyector activo. Un inyector nuevo tiene su propia cach\u00e9 y puede recurrir a la escalera del inyector anterior.',
-                    'lifecycle.transient.text': 'Marca una clase para que no se guarde en la cach\u00e9 administrada por el inyector y se cree autom\u00e1ticamente una instancia nueva cada vez. Un objeto registrado expl\u00edcitamente y la f\u00e1brica propia de la clase siguen teniendo prioridad.',
-                    'lifecycle.singleton.text': 'Implementa <code>getInstance()</code> cuando la clase deba controlar su creaci\u00f3n. El inyector delega en ese m\u00e9todo en lugar de invocar al constructor.',
-                    'resolution.label': '04 / resoluci\u00f3n de par\u00e1metros',
-                    'resolution.title': 'Sigue el orden de resoluci\u00f3n.',
-                    'resolution.intro': 'Para cada par\u00e1metro de un constructor, m\u00e9todo, closure o funci\u00f3n, el inyector se detiene en la primera fuente que coincide. Los valores expl\u00edcitos tienen prioridad.',
-                    'resolution.aria': 'Orden de resoluci\u00f3n de par\u00e1metros',
-                    'resolution.explicit.title': 'Argumentos expl\u00edcitos',
-                    'resolution.explicit.text': 'Clave de tipo, nombre del par\u00e1metro y, por \u00faltimo, posici\u00f3n num\u00e9rica.',
-                    'resolution.attribute.text': 'Usa el ID del proveedor indicado por el atributo del par\u00e1metro.',
-                    'resolution.typed.title': 'Proveedor por tipo',
-                    'resolution.typed.text': 'Busca un proveedor registrado para un tipo con nombre no incorporado.',
-                    'resolution.types': 'La resoluci\u00f3n autom\u00e1tica por tipo admite proveedores registrados para tipos con nombre no incorporados, incluidas clases, interfaces, clases abstractas, instancias de enum, tipos con nombre anulables y proveedores Closure. Los tipos incorporados, callable, los par\u00e1metros sin tipo y los tipos de uni\u00f3n o intersecci\u00f3n requieren un argumento expl\u00edcito o #[Inject(\'id\')]. Los par\u00e1metros vari\u00e1dicos aceptan cero o m\u00e1s valores.',
-                    'resolution.example': 'Se pueden usar juntos un proveedor Closure registrado por tipo y un proveedor de clase con valores en forma de lista:',
-                    'resolution.default.title': 'Valor predeterminado de PHP',
-                    'resolution.default.text': 'Usa el valor predeterminado del par\u00e1metro cuando no coincida ning\u00fan proveedor.',
-                    'resolution.exception.title': 'Excepci\u00f3n',
-                    'resolution.exception.text': 'Los valores obligatorios ausentes generan InjectorException.',
-                    'resolution.note': 'Los arrays de argumentos deben usar un \u00fanico estilo de claves en cada llamada. Se rechaza mezclar claves enteras y de texto para no confundir la intenci\u00f3n posicional con la asociada a nombres.',
-                    'targets.label': '05 / puntos de inyecci\u00f3n',
-                    'targets.title': 'No solo constructores.',
-                    'targets.intro': 'El mismo mecanismo de resoluci\u00f3n de par\u00e1metros funciona tanto al construir clases como al invocar callables. Los arrays de m\u00e9todos aceptan un nombre de clase o un objeto existente.',
-                    'targets.class.title': 'Nombre de clase',
-                    'targets.class.text': 'resuelve su constructor.',
-                    'targets.method.title': 'Array callable',
-                    'targets.method.text': 'o un objeto como destino.',
-                    'targets.callable.title': 'Cadena callable',
-                    'targets.callable.text': 'o una funci\u00f3n global como',
-                    'targets.closure.title': 'Closure',
-                    'targets.closure.text': 'Una closure recibe proveedores y valores expl\u00edcitos para sus par\u00e1metros.',
-                    'targets.invokable.title': 'Objeto invocable',
-                    'targets.invokable.text': 'se resuelve como callable.',
-                    'api.label': '06 / API p\u00fablica',
-                    'api.title': 'API peque\u00f1a, l\u00edmites claros.',
-                    'api.intro': 'Usa el mapa de la API cuando necesites conocer con precisi\u00f3n la responsabilidad de cada elemento. Los enlaces al c\u00f3digo fuente apuntan directamente a la implementaci\u00f3n en GitHub.',
-                    'api.note.title': 'Recuerda:',
-                    'api.note.text': 'El <code>Injector</code> construido m\u00e1s recientemente es el activo. Usa <code>Injector::inject()</code> o <code>PHPInjector\\DI\\inject()</code> para resolver a trav\u00e9s de \u00e9l y su escalera de padres.',
-                    'api.construct.text': 'Acepta un array o un <code>Container</code> de proveedores y un inyector padre opcional. Sin un padre expl\u00edcito, el inyector activo anterior pasa a ser el padre y la nueva instancia se activa.',
-                    'api.inject.text': 'Resuelve est\u00e1ticamente clases, m\u00e9todos, closures, funciones, cadenas callable y objetos invocables a trav\u00e9s del inyector activo.',
-                    'api.function.text': 'Punto de entrada de funci\u00f3n global para <code>Injector::inject()</code>, utilizando el inyector activo.',
-                    'api.add.text': 'Guarda o reemplaza un proveedor mediante un ID expl\u00edcito en forma de cadena. Los proveedores class-string se mantienen diferidos hasta la resoluci\u00f3n.',
-                    'api.container.text': 'Contenedor compatible con PSR-11 que ofrece <code>has()</code>, <code>get()</code>, <code>set()</code>, <code>unset()</code>, <code>count()</code> e iteraci\u00f3n.',
-                    'api.injectAttribute.text': 'Atributo de par\u00e1metro para seleccionar un proveedor con nombre; resulta especialmente \u00fatil para valores escalares o contextuales.',
-                    'api.transient.text': 'Atributo de clase que evita que la construcci\u00f3n autom\u00e1tica se guarde en la cach\u00e9 administrada por el inyector.',
-                    'api.singleton.text': 'Contrato que exige una f\u00e1brica p\u00fablica est\u00e1tica <code>getInstance(): self</code> para que la clase controle su identidad.',
-                    'development.label': '07 / desarrollo local',
-                    'development.title': 'Mant\u00e9n \u00e1gil el ciclo de desarrollo.',
-                    'development.intro': 'Los scripts de Composer son la referencia del repositorio para el an\u00e1lisis est\u00e1tico, las pruebas, la cobertura y la validaci\u00f3n del paquete. CI ejecuta las mismas comprobaciones en PHP 8.4 y 8.5 y publica la cobertura en Codecov.',
-                    'development.verify': 'Comprobar un cambio',
-                    'development.read': 'Leer el resto',
-                    'development.readme': 'Ejemplos completos del README',
-                    'development.contributing': 'Gu\u00eda para contribuir',
-                    'development.changelog': 'Registro de cambios',
-                    'development.security': 'Notificar un problema de seguridad',
-                    'development.ci': 'CI y cobertura',
-                    'footer.license': 'PHPInjector es software de c\u00f3digo abierto con licencia Apache-2.0.'
-                }
-            };
-
-            const fallbackLocale = 'en_US';
-            const languageSelect = document.getElementById('language-select');
-
-            const getString = (locale, key) => translations[locale][key] ?? translations[fallbackLocale][key] ?? key;
-
-            const applyLanguage = (locale, persist = true) => {
-                const nextLocale = translations[locale] ? locale : fallbackLocale;
-                const strings = translations[nextLocale];
-
-                document.documentElement.lang = nextLocale === 'es_ES' ? 'es-ES' : 'en-US';
-                document.title = strings['page.title'];
-                document.querySelector('meta[name="description"]').setAttribute('content', strings['page.description']);
-
-                document.querySelectorAll('[data-i18n]').forEach((element) => {
-                    element.textContent = getString(nextLocale, element.dataset.i18n);
-                });
-
-                document.querySelectorAll('[data-i18n-html]').forEach((element) => {
-                    element.innerHTML = getString(nextLocale, element.dataset.i18nHtml);
-                });
-
-                document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
-                    element.setAttribute('aria-label', getString(nextLocale, element.dataset.i18nAriaLabel));
-                });
-
-                if (languageSelect) {
-                    languageSelect.value = nextLocale;
-                }
-
-                if (persist) {
-                    try {
-                        localStorage.setItem('phpinjector-language', nextLocale);
-                    } catch {}
-                }
-            };
-
-            if (languageSelect) {
-                languageSelect.addEventListener('change', () => applyLanguage(languageSelect.value));
-            }
-
-            let savedLanguage = fallbackLocale;
-            try {
-                savedLanguage = localStorage.getItem('phpinjector-language') || fallbackLocale;
-            } catch {}
-
-            applyLanguage(savedLanguage, false);
-        })();
-    </script>
 </body>
 </html>
