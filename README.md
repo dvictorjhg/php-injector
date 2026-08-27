@@ -25,7 +25,7 @@ The [PHPInjector documentation page](docs/index.html) is the visual entry point 
 
 ## Requirements
 
-- PHP 8.4+
+- PHP 8.3+
 - Composer
 
 ## Installation
@@ -657,7 +657,7 @@ The package includes `PHPInjector\Container\Container`, a PSR-11 compatible cont
 
 ## Quality
 
-The main CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml) uses [GitHub Actions](https://github.com/features/actions) on PHP 8.4 and 8.5 to validate [Composer](https://getcomposer.org/) metadata, run [PHPStan](https://phpstan.org/) static analysis, execute the [PHPUnit](https://phpunit.de/) suite with [Xdebug](https://xdebug.org/) coverage enabled, publish the Clover report to [Codecov](https://codecov.io/gh/dvictorjhg/php-injector), and fail the build if statement coverage drops below 80%.
+The main CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml) uses [GitHub Actions](https://github.com/features/actions) on PHP 8.3, 8.4, and 8.5 to validate [Composer](https://getcomposer.org/) metadata, run [PHPStan](https://phpstan.org/) static analysis, execute the [PHPUnit](https://phpunit.de/) suite with [Xdebug](https://xdebug.org/) coverage enabled, publish the Clover report to [Codecov](https://codecov.io/gh/dvictorjhg/php-injector), and fail the build if statement coverage drops below 80%.
 
 Before the first upload, enable the repository in Codecov. Public pull requests from forks can upload from an unprotected branch without a token, but uploads for protected branches and all private repositories require a Codecov token unless token authentication for public repositories has been disabled in Codecov's **Global Upload Token** settings. For the reliable protected-branch path, add the repository token as a GitHub Actions secret named `CODECOV_TOKEN` under **Settings > Secrets and variables > Actions**. Keep it in GitHub Secrets rather than committing it to the repository. If the repository is private, copy the tokenized badge URL from Codecov's **Badges & Graphs** settings and replace the badge image URL above.
 

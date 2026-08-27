@@ -96,8 +96,8 @@ The above example gives reviewers the problem, the behavior change, and the veri
 ````markdown
 ## Environment
 
-- PHP: 8.4.x or 8.5.x
-- Package: 1.0.0, dev-main, or commit SHA
+- PHP: 8.3.x, 8.4.x, or 8.5.x
+- Package: 1.0.1, dev-main, or commit SHA
 
 ## Reproducer
 
