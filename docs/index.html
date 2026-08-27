@@ -74,7 +74,12 @@ final class MyService
 {
 }
 
-$service = Injector::inject(MyService::class);</code></pre>
+$service = Injector::inject(MyService::class);
+echo get_class($service);</code></pre>
+                    <div class="example-output">
+                        <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                        <pre><code>MyService</code></pre>
+                    </div>
                 </div>
             </div>
         </section>
@@ -112,7 +117,13 @@ $dsn = 'mysql:host=db;dbname=app';
 
 $injector = new Injector();
 $injector-&gt;addProvider(Logger::class, $logger);
-$injector-&gt;addProvider('db.dsn', $dsn);</code></pre>
+$injector-&gt;addProvider('db.dsn', $dsn);
+
+echo Injector::inject('db.dsn');</code></pre>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code>mysql:host=db;dbname=app</code></pre>
+                        </div>
                     </article>
                 </div>
                 <div class="provider-table-wrap">
@@ -156,23 +167,30 @@ $injector-&gt;addProvider('db.dsn', $dsn);</code></pre>
                         <span class="section-number" data-i18n="lifecycle.number">02 / Lifecycle</span>
                         <h2 data-i18n="lifecycle.title">Choose where identity lives.</h2>
                     </div>
-                    <p data-i18n="lifecycle.lede">Most objects should be transient. Mark the few that own identity or expensive state as singletons, and opt out locally when a fresh object matters.</p>
+                    <p data-i18n="lifecycle.lede">The injector caches concrete classes by default. Use the Transient attribute when each resolution needs a fresh object, or implement the Singleton contract when the class should own its instance.</p>
                 </div>
                 <div class="lifecycle-grid">
                     <article class="lifecycle-item">
                         <h3 data-i18n="lifecycle.transientTitle">Transient</h3>
-                        <p data-i18n="lifecycle.transientText">The default. Each call creates a fresh instance unless a concrete provider already exists.</p>
+                        <p data-i18n-html="lifecycle.transientText">Add <code>#[Transient]</code> to skip injector caching. Each resolution that constructs the class gets a fresh instance.</p>
                     </article>
                     <article class="lifecycle-item">
                         <h3 data-i18n="lifecycle.singletonTitle">Singleton</h3>
-                        <p data-i18n-html="lifecycle.singletonText">Implement <code>Singleton</code> to cache the concrete class in the active injector.</p>
+                        <p data-i18n-html="lifecycle.singletonText">Implement <code>Singleton</code> when the class should own a shared instance. The injector calls <code>getInstance()</code> instead of its constructor.</p>
                     </article>
                     <article class="lifecycle-item">
-                        <h3 data-i18n="lifecycle.overrideTitle">Override</h3>
-                        <p data-i18n-html="lifecycle.overrideText">Add <code>#[Transient]</code> to a singleton class when one injection point needs a fresh instance.</p>
+                        <h3 data-i18n="lifecycle.overrideTitle">Per-call</h3>
+                        <p data-i18n-html="lifecycle.overrideText">Pass an explicit instance when one resolution needs a fresh dependency. <code>#[Transient]</code> applies to the whole class and does not replace <code>Singleton</code>.</p>
                     </article>
                 </div>
-                <pre class="lifecycle-code"><code>#[Transient]
+                <pre class="lifecycle-code"><code>&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Attributes\Transient;
+use PHPInjector\DI\Injector;
+
+#[Transient]
 final class RequestStamp
 {
 }
@@ -180,7 +198,11 @@ final class RequestStamp
 $first = Injector::inject(RequestStamp::class);
 $second = Injector::inject(RequestStamp::class);
 
-$first === $second; // false</code></pre>
+var_dump($first === $second);</code></pre>
+                <div class="example-output">
+                    <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                    <pre><code>bool(false)</code></pre>
+                </div>
             </div>
         </section>
 
@@ -235,6 +257,10 @@ use PHPInjector\DI\Injector;
 $args = ['string' =&gt; 'cache'];
 $length = Injector::inject('strlen', $args);
 echo $length;</code></pre>
+                                    <div class="example-output">
+                                        <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                                        <pre><code>5</code></pre>
+                                    </div>
                                 </div>
                             </div>
                         </article>
@@ -346,6 +372,7 @@ echo $length;</code></pre>
                             <span data-i18n-html="targets.invokableText">Uses the object's <code>__invoke</code> method.</span>
                         </li>
                     </ul>
+                    <div class="code-example">
                     <pre><code>&lt;?php
 
 declare(strict_types=1);
@@ -370,6 +397,12 @@ final class ReportJobs
 $injector = new Injector([Logger::class]);
 echo Injector::inject('ReportJobs::warm') . PHP_EOL;
 echo Injector::inject(static fn (Logger $logger): string =&gt; $logger-&gt;channel);</code></pre>
+                    <div class="example-output">
+                        <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                        <pre><code>warming app
+app</code></pre>
+                    </div>
+                    </div>
                 </div>
                 <div class="targets-variadic">
                     <h3 data-i18n="targets.variadicTitle">Variadics stay positional</h3>
@@ -384,6 +417,10 @@ echo Injector::inject(
     fn (int ...$values): int =&gt; array_sum($values),
     [2, 3, 5],
 );</code></pre>
+                    <div class="example-output">
+                        <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                        <pre><code>10</code></pre>
+                    </div>
                 </div>
             </div>
         </section>

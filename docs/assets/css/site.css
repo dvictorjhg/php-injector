@@ -107,6 +107,43 @@ pre code {
     font-size: inherit;
 }
 
+.code-example {
+    display: grid;
+    gap: 14px;
+}
+
+.example-output {
+    display: grid;
+    gap: 7px;
+    margin-top: 14px;
+}
+
+.code-example .example-output,
+.quickstart .example-output,
+.resolution-args-context .example-output {
+    margin-top: 0;
+}
+
+.example-output-label {
+    display: block;
+    color: var(--coral);
+    font-family: "Space Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.example-output pre {
+    color: var(--ink);
+    background: var(--surface);
+    border-color: var(--line);
+}
+
+.example-output pre code {
+    color: inherit;
+}
+
 .wrap {
     width: min(1180px, calc(100% - 40px));
     margin: 0 auto;
@@ -399,6 +436,14 @@ h1 {
 .quickstart pre {
     border: 0;
     background: transparent;
+}
+
+.quickstart .example-output {
+    padding: 0 20px 20px;
+}
+
+.quickstart .example-output-label {
+    color: #f4d487;
 }
 
 .section {

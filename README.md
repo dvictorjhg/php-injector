@@ -78,7 +78,7 @@ $service = Injector::inject(ReportService::class);
 echo $service->generate();
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 [app] quarterly-report
@@ -141,7 +141,7 @@ var_dump($firstLogger === $secondLogger);
 echo $formatter->format($context->source . ':' . Injector::inject('env'));
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 bool(true)
@@ -196,7 +196,7 @@ echo Injector::inject(static fn (Logger $logger): string => "closure: {$logger->
 echo Injector::inject('ReportJobs::warm');
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 sales via app
@@ -237,7 +237,7 @@ $args = [
 echo Injector::inject([ReportLabel::class, 'build'], $args);
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 Report: Quarterly Sales
@@ -286,7 +286,7 @@ $injector = new Injector([
 echo Injector::inject(ReportService::class)->describe();
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 app:production
@@ -331,7 +331,7 @@ var_dump($first === $second);
 echo $first->name;
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 bool(true)
@@ -373,7 +373,7 @@ var_dump($first === $second);
 var_dump($first->id === $second->id);
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 bool(false)
@@ -424,7 +424,7 @@ $service = Injector::inject(ReportService::class);
 echo $service->generate();
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 [app] child-report
@@ -480,7 +480,7 @@ echo $formatted . PHP_EOL;
 echo $channels;
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 READY
@@ -517,7 +517,7 @@ echo Injector::inject($target, ['logger' => $logger]) . PHP_EOL;
 echo Injector::inject($target, [$logger]) . PHP_EOL;
 ```
 
-The three calls will each output:
+**Expected output:**
 
 ```text
 worker
@@ -539,7 +539,7 @@ $length = Injector::inject('strlen', $args);
 echo $length;
 ```
 
-This will output:
+**Expected output:**
 
 ```text
 5
@@ -639,7 +639,7 @@ echo Injector::inject([ReportRunner::class, 'run'], [
 ]);
 ```
 
-The above example will output:
+**Expected output:**
 
 ```text
 app:production:sales
