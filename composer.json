@@ -23,7 +23,7 @@
     "support": {
         "issues": "https://github.com/dvictorjhg/php-injector/issues",
         "source": "https://github.com/dvictorjhg/php-injector",
-        "docs": "https://github.com/dvictorjhg/php-injector/tree/main/docs"
+        "docs": "https://dvictorjhg.github.io/php-injector/"
     },
     "require": {
         "php": "^8.3",
