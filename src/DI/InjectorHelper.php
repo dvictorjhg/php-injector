@@ -5,15 +5,6 @@ declare(strict_types=1);
 namespace PHPInjector\DI;
 
 use Closure;
-use function array_key_exists;
-use function class_exists;
-use function count;
-use function explode;
-use function is_array;
-use function is_int;
-use function is_object;
-use function is_string;
-use function strpos;
 use PHPInjector\DI\Attributes\Inject;
 use PHPInjector\DI\Attributes\Transient;
 use PHPInjector\Exceptions\InjectorException;
@@ -57,15 +48,15 @@ final class InjectorHelper
      */
     public static function isMethodTarget(mixed $injectionTarget): bool
     {
-        if (!is_array($injectionTarget) || count($injectionTarget) !== 2) {
+        if (!\is_array($injectionTarget) || \count($injectionTarget) !== 2) {
             return false;
         }
 
         $target = $injectionTarget[0] ?? null;
         $method = $injectionTarget[1] ?? null;
 
-        return (is_object($target) || (is_string($target) && class_exists($target)))
-            && is_string($method);
+        return (\is_object($target) || (\is_string($target) && \class_exists($target)))
+            && \is_string($method);
     }
 
     /**
@@ -81,16 +72,16 @@ final class InjectorHelper
         Closure $injectObject,
         Closure $injectFunction
     ): mixed {
-        if (is_string($callable)) {
-            if (strpos($callable, '::') !== false) {
+        if (\is_string($callable)) {
+            if (\strpos($callable, '::') !== false) {
                 /** @var class-string $class */
-                [$class, $method] = explode('::', $callable, 2);
+                [$class, $method] = \explode('::', $callable, 2);
 
                 $result = $injectObject($class, $args, $method);
             } else {
                 $result = $injectFunction($callable, $args);
             }
-        } elseif (is_array($callable)) {
+        } elseif (\is_array($callable)) {
             /** @var class-string|object $object */
             /** @var non-falsy-string $method */
             [$object, $method] = $callable;
@@ -150,7 +141,7 @@ final class InjectorHelper
      */
     public static function resolveMagicMethodName(ReflectionClass $reflectionClass, object|string $id): ?string
     {
-        $preferredMethods = is_string($id)
+        $preferredMethods = \is_string($id)
             ? ['__callStatic', '__call']
             : ['__call', '__callStatic'];
 
@@ -264,16 +255,16 @@ final class InjectorHelper
     ): mixed {
         $resolvedValue = $missingValue;
 
-        if ($parameterTypeName !== '' && array_key_exists($parameterTypeName, $args)) {
+        if ($parameterTypeName !== '' && \array_key_exists($parameterTypeName, $args)) {
             $resolvedValue = $args[$parameterTypeName];
-        } elseif (array_key_exists($parameterName, $args)) {
+        } elseif (\array_key_exists($parameterName, $args)) {
             $resolvedValue = $args[$parameterName];
-        } elseif (!$variadic && array_key_exists($parameterPosition, $args)) {
+        } elseif (!$variadic && \array_key_exists($parameterPosition, $args)) {
             $resolvedValue = $args[$parameterPosition];
         } elseif ($variadic) {
             $values = [];
             foreach ($args as $key => $value) {
-                if (is_int($key) && $key >= $parameterPosition) {
+                if (\is_int($key) && $key >= $parameterPosition) {
                     $values[] = $value;
                 }
             }
@@ -307,10 +298,10 @@ final class InjectorHelper
         $hasIntegerKeys = false;
         $hasStringKeys = false;
 
-        foreach (array_keys($arr) as $key) {
-            if (is_int($key)) {
+        foreach (\array_keys($arr) as $key) {
+            if (\is_int($key)) {
                 $hasIntegerKeys = true;
-            } elseif (is_string($key)) {
+            } elseif (\is_string($key)) {
                 $hasStringKeys = true;
             }
 

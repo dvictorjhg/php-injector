@@ -6,7 +6,6 @@ namespace PHPInjector\Tests\Mock;
 
 use Closure;
 use PHPInjector\DI\Attributes\Inject;
-use function count;
 
 /**
  * Method signatures used to exercise constructor, method, scalar, and variadic injection paths.
@@ -94,7 +93,7 @@ class Methods
 
     public static function staticMethodWithVariableLengthArgumentList(SimpleProvider ...$provider): int
     {
-        return count($provider);
+        return \count($provider);
     }
 
     protected static function staticProtectedMethod(SimpleProvider $simpleProvider): SimpleProvider

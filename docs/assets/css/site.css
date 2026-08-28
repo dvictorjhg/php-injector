@@ -3,13 +3,17 @@
     --surface: #fffdf8;
     --ink: #102f30;
     --deep: #102f30;
-    --muted: #55706c;
+    --muted: #4b6662;
     --line: #cbd6cb;
     --teal: #0a716c;
     --teal-soft: #d7ebe1;
     --coral: #e46550;
+    --coral-text: #a84336;
+    --coral-on-dark: #ffae96;
     --yellow: #efc85b;
     --blue: #4d72d6;
+    --blue-on-dark: #9bb0f2;
+    --teal-on-dark: #8cd8c1;
     --white: #fffdf8;
     --code: #173d3e;
     --shadow: 0 18px 44px rgba(16, 47, 48, 0.12);
@@ -25,6 +29,7 @@ html[data-theme="dark"] {
     --teal: #8cd8c1;
     --teal-soft: #224c4b;
     --coral: #f48c75;
+    --coral-text: #ffae96;
     --yellow: #f3d16c;
     --blue: #9bb0f2;
     --white: #faf7ec;
@@ -126,7 +131,7 @@ pre code {
 
 .example-output-label {
     display: block;
-    color: var(--coral);
+    color: var(--coral-text);
     font-family: "Space Mono", monospace;
     font-size: 0.68rem;
     font-weight: 700;
@@ -356,7 +361,7 @@ a:focus-visible {
 
 .nav-links a:hover,
 .nav-links a:focus-visible {
-    color: var(--coral);
+    color: var(--coral-text);
 }
 
 .nav-github {
@@ -474,7 +479,7 @@ h1 {
     text-transform: uppercase;
 }
 
-.quickstart pre {
+.quickstart > pre {
     border: 0;
     background: transparent;
 }
@@ -498,6 +503,7 @@ h1 {
 }
 
 .section.ink {
+    --coral-text: var(--coral-on-dark);
     color: var(--white);
     background: var(--deep);
     border-bottom-color: #285455;
@@ -540,7 +546,7 @@ h1 {
 .section-number {
     display: block;
     margin-bottom: 12px;
-    color: var(--coral);
+    color: var(--coral-text);
     font-family: "Space Mono", monospace;
     font-size: 0.75rem;
     font-weight: 700;
@@ -657,7 +663,7 @@ html[data-theme="dark"] .provider-table th {
     place-items: center;
     width: 24px;
     height: 24px;
-    color: var(--ink);
+    color: var(--deep);
     background: var(--yellow);
     border-radius: 50%;
     font-family: "Space Mono", monospace;
@@ -766,15 +772,15 @@ html[data-theme="dark"] .lifecycle-item code {
 
 .resolution-stage-attribute .resolution-index,
 .resolution-stage-exception .resolution-index {
-    color: var(--coral);
+    color: var(--coral-on-dark);
 }
 
 .resolution-stage-typed .resolution-index {
-    color: var(--blue);
+    color: var(--blue-on-dark);
 }
 
 .resolution-stage-default .resolution-index {
-    color: var(--teal);
+    color: var(--teal-on-dark);
 }
 
 .resolution-kind,
@@ -1286,12 +1292,10 @@ footer p {
 
 @keyframes reveal {
     from {
-        opacity: 0;
         transform: translateY(10px);
     }
 
     to {
-        opacity: 1;
         transform: translateY(0);
     }
 }

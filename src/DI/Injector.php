@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace PHPInjector\DI;
 
 use Closure;
-use function array_values;
-use function class_exists;
-use function is_array;
-use function is_object;
-use function is_string;
 use PHPInjector\Container\Container;
 use PHPInjector\Contracts\Singleton;
 use PHPInjector\Exceptions\InjectorException;
@@ -79,7 +74,7 @@ class Injector
         $injector = self::instance();
         InjectorHelper::assertValidInjectionInput($injectionTarget, $args);
 
-        if (is_callable($injectionTarget)) {
+        if (\is_callable($injectionTarget)) {
             return InjectorHelper::injectCallable(
                 $injectionTarget,
                 $args,
@@ -173,11 +168,11 @@ class Injector
             return $this->injectObject($injectionTarget[0], $args, $injectionTarget[1]);
         }
 
-        if (is_object($injectionTarget)) {
+        if (\is_object($injectionTarget)) {
             return $this->injectObject($injectionTarget, $args);
         }
 
-        if (is_string($injectionTarget)) {
+        if (\is_string($injectionTarget)) {
             return $this->resolveStringTarget($injectionTarget, $args);
         }
 
@@ -194,14 +189,14 @@ class Injector
         $provider = $this->getProvider($injectionTarget);
 
         if ($provider !== $this->missingValue) {
-            if (is_string($provider) && class_exists($provider)) {
+            if (\is_string($provider) && \class_exists($provider)) {
                 return $this->instantiateAndStore($injectionTarget, $args, $provider);
             }
 
             return $provider;
         }
 
-        if (class_exists($injectionTarget)) {
+        if (\class_exists($injectionTarget)) {
             return $this->instantiateAndStore($injectionTarget, $args);
         }
 
@@ -230,7 +225,7 @@ class Injector
         if (!$isTransient && $this->providers->has($resolvedClassName)) {
             $instance = $this->providers->get($resolvedClassName);
 
-            if (is_object($instance)) {
+            if (\is_object($instance)) {
                 if ($storageId !== $resolvedClassName) {
                     $this->addProvider($storageId, $instance);
                 }
@@ -325,13 +320,13 @@ class Injector
      */
     private function resolveTargetObject(ReflectionClass $reflectionClass, object|string $id, array $args): object
     {
-        if (is_object($id)) {
+        if (\is_object($id)) {
             return $id;
         }
 
         $target = $this->resolveStringTarget($reflectionClass->name, $args);
 
-        if (!is_object($target)) {
+        if (!\is_object($target)) {
             throw new InjectorException(
                 "Target '{$reflectionClass->name}' did not resolve to an object."
             );
@@ -394,7 +389,7 @@ class Injector
         } elseif (!$reflectionParameter->isVariadic()) {
             $resolvedValues = [$provider];
         } else {
-            $resolvedValues = is_array($provider) ? array_values($provider) : [$provider];
+            $resolvedValues = \is_array($provider) ? \array_values($provider) : [$provider];
         }
 
         return $resolvedValues;
@@ -418,7 +413,7 @@ class Injector
                 if (
                     $type instanceof ReflectionNamedType
                     && !$type->isBuiltin()
-                    && is_string($provider)
+                    && \is_string($provider)
                 ) {
                     $provider = $injector->resolveStringTarget($provider, []);
                 }

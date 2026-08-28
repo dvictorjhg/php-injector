@@ -368,7 +368,7 @@ final class InjectorHelperTest extends TestCase
     {
         $objectCalls = 0;
         $functionCalls = 0;
-        self::assertTrue(is_callable($callable));
+        self::assertTrue(\is_callable($callable));
 
         /** @var callable $callableTarget */
         $callableTarget = $callable;
@@ -404,7 +404,7 @@ final class InjectorHelperTest extends TestCase
     {
         $objectCalls = 0;
         $functionCalls = 0;
-        self::assertTrue(is_callable($callable));
+        self::assertTrue(\is_callable($callable));
 
         /** @var callable $callableTarget */
         $callableTarget = $callable;

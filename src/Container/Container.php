@@ -8,12 +8,6 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use Psr\Container\ContainerInterface;
-use function array_key_exists;
-use function count;
-use function is_bool;
-use function is_object;
-use function is_string;
-use function settype;
 
 /**
  * Small PSR-11 provider store used by the injector.
@@ -42,7 +36,7 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
         foreach ($content as $key => $value) {
             $keyStr = $this->resolveContentKey($key, $value);
 
-            if (array_key_exists($keyStr, $processedContent)) {
+            if (\array_key_exists($keyStr, $processedContent)) {
                 throw new ContainerException("Duplicate key: '$keyStr'");
             }
 
@@ -57,15 +51,15 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
      */
     private function resolveContentKey(int|string $key, mixed $value): string
     {
-        if (is_string($key)) {
+        if (\is_string($key)) {
             return $key;
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return $value;
         }
 
-        if (is_object($value)) {
+        if (\is_object($value)) {
             return $value::class;
         }
 
@@ -83,11 +77,11 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
             return 'null';
         }
 
-        if (is_bool($value)) {
+        if (\is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        settype($value, 'string');
+        \settype($value, 'string');
 
         return $value;
     }
@@ -95,9 +89,10 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
     /**
      * Check whether an identifier is present, including entries whose value is null.
      */
+    #[\Override]
     public function has(string $key): bool
     {
-        return array_key_exists($key, $this->content);
+        return \array_key_exists($key, $this->content);
     }
 
     /**
@@ -121,6 +116,7 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
      *
      * @throws NotFoundException When the identifier is not present.
      */
+    #[\Override]
     public function get(string $id): mixed
     {
         if ($this->has($id)) {
@@ -133,9 +129,10 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
     /**
      * Return the number of stored identifiers.
      */
+    #[\Override]
     public function count(): int
     {
-        return count($this->content);
+        return \count($this->content);
     }
 
     /**
@@ -143,6 +140,7 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
      *
      * @return ArrayIterator<int|string, mixed>
      */
+    #[\Override]
     public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->content);

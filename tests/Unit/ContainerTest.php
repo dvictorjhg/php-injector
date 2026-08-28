@@ -125,7 +125,7 @@ final class ContainerTest extends TestCase
     public function testGetIteratorReturnsContainerContents(): void
     {
         $container = $this->createFilledContainer();
-        $items = iterator_to_array($container);
+        $items = \iterator_to_array($container);
 
         $this->assertSame([
             'key0' => 'value0',
