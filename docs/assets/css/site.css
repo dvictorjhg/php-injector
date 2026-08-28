@@ -183,24 +183,65 @@ html[data-theme="dark"] .site-header {
     align-items: center;
     gap: 10px;
     color: var(--ink);
-    font-size: 1.05rem;
-    font-weight: 700;
     text-decoration: none;
 }
 
 .brand-mark {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    color: var(--white);
-    background: var(--coral);
-    border: 2px solid var(--ink);
-    border-radius: 3px;
-    font-family: "Space Mono", monospace;
-    font-size: 0.75rem;
+    display: block;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+.injector-input,
+.injector-arrow,
+.injector-rail,
+.injector-output {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3.5;
+}
+
+.injector-input,
+.injector-arrow {
+    stroke: var(--coral);
+}
+
+.injector-rail {
+    stroke: var(--teal);
+}
+
+.injector-output-one,
+.injector-node-one {
+    stroke: var(--blue);
+    fill: var(--blue);
+}
+
+.injector-output-two,
+.injector-node-two {
+    stroke: var(--yellow);
+    fill: var(--yellow);
+}
+
+.brand-copy {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.brand-name {
+    font-family: "DM Sans", sans-serif;
+    font-size: 1.15rem;
     font-weight: 700;
     line-height: 1;
+}
+
+.brand-prefix {
+    color: var(--teal);
+    font-family: "Space Mono", monospace;
+    font-size: 0.86em;
 }
 
 .version {
