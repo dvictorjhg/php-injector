@@ -1,7 +1,13 @@
 # PHPInjector
 
-[![CI](https://github.com/dvictorjhg/php-injector/actions/workflows/ci.yml/badge.svg)](https://github.com/dvictorjhg/php-injector/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/dvictorjhg/php-injector/branch/main/graph/badge.svg)](https://codecov.io/gh/dvictorjhg/php-injector)
+[![Latest Version on Packagist][badge-packagist-version]][packagist]
+[![Monthly Downloads on Packagist][badge-packagist-downloads]][packagist]
+[![Total Downloads on Packagist][badge-packagist-total-downloads]][packagist]
+[![PHP Version Required][badge-php-version]][packagist]
+[![License][badge-license]](LICENSE)
+[![CI][badge-ci]][ci]
+[![Codecov][badge-codecov]][codecov]
+[![Open Issues][badge-issues]][issues]
 
 PHPInjector is a small reflection-based dependency injection package for modern PHP. It gives you a PSR-11 compatible container, a lightweight injector, a parameter attribute for explicit value binding, and a self-managed singleton contract without forcing a large framework around your code.
 
@@ -719,3 +725,16 @@ For academic, professional, blog, package, or product reuse, keep attribution in
 The maintainer wants this project credited when it is reused and does not want it stripped of attribution or turned into low-quality AI-generated derivative spam. That expectation is documented in [AI_USE_POLICY.md](AI_USE_POLICY.md).
 
 Important: that policy is intentionally documented as project guidance, not as an extra open-source restriction. If you need enforceable no-AI or no-training terms, you would need a source-available non-open-source license instead.
+
+[badge-packagist-version]: https://img.shields.io/packagist/v/dvictorjhg/php-injector.svg?style=flat-square
+[badge-packagist-downloads]: https://img.shields.io/packagist/dm/dvictorjhg/php-injector.svg?style=flat-square
+[badge-packagist-total-downloads]: https://img.shields.io/packagist/dt/dvictorjhg/php-injector.svg?style=flat-square
+[badge-php-version]: https://img.shields.io/packagist/php-v/dvictorjhg/php-injector.svg?style=flat-square
+[badge-license]: https://img.shields.io/packagist/l/dvictorjhg/php-injector.svg?style=flat-square
+[badge-ci]: https://github.com/dvictorjhg/php-injector/actions/workflows/ci.yml/badge.svg?branch=main
+[badge-codecov]: https://codecov.io/gh/dvictorjhg/php-injector/branch/main/graph/badge.svg
+[badge-issues]: https://img.shields.io/github/issues/dvictorjhg/php-injector.svg?style=flat-square
+[packagist]: https://packagist.org/packages/dvictorjhg/php-injector
+[ci]: https://github.com/dvictorjhg/php-injector/actions/workflows/ci.yml
+[codecov]: https://codecov.io/gh/dvictorjhg/php-injector
+[issues]: https://github.com/dvictorjhg/php-injector/issues
