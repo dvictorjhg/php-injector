@@ -15,7 +15,7 @@ PHPInjector exists for projects that want constructor and method injection witho
 
 ## Documentation
 
-The [PHPInjector documentation page](docs/index.html) is the visual entry point for installation, common injection targets, provider lifecycles, parameter resolution, and the public API. It is a static GitHub Pages site with relative CSS and JavaScript assets under `/docs/assets`. It defaults to English and the light theme; both preferences can be changed from the header and persist in the browser. This README remains the copy-and-paste reference for the full examples.
+The [PHPInjector documentation page](https://dvictorjhg.github.io/php-injector/) is the visual entry point for installation, common injection targets, provider lifecycles, parameter resolution, and the public API. It is a static GitHub Pages site with relative CSS and JavaScript assets under `/docs/assets`. It defaults to English and the light theme; both preferences can be changed from the header and persist in the browser. This README remains the copy-and-paste reference for the full examples.
 
 ## Why Use PHPInjector
 
