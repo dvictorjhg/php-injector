@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows Semantic Versioning.
 
+## [1.0.2] - 2026-08-31
+
+### Changed
+
+- Simplified internal container and injection validation without changing the public API.
+- Refined the static documentation site with responsive layouts, project branding, and clearer provider and resolution guidance.
+
 ## [1.0.1] - 2026-08-27
 
 ### Added

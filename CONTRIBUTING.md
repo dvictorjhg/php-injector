@@ -97,7 +97,7 @@ The above example gives reviewers the problem, the behavior change, and the veri
 ## Environment
 
 - PHP: 8.3.x, 8.4.x, or 8.5.x
-- Package: 1.0.1, dev-main, or commit SHA
+- Package: 1.0.2, dev-main, or commit SHA
 
 ## Reproducer
 

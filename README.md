@@ -766,7 +766,7 @@ Release notes for the first public release and future unreleased changes live in
 
 ## Release / Publishing
 
-For a release, update [CHANGELOG.md](CHANGELOG.md), validate the package with `composer validate --strict`, `composer analyse`, and `composer test`, then create and push an annotated Git tag such as `1.0.1`.
+For a release, update [CHANGELOG.md](CHANGELOG.md), validate the package with `composer validate --strict`, `composer analyse`, and `composer test`, then create and push an annotated Git tag such as `1.0.2`.
 
 After the tag is on GitHub, publish a GitHub Release for that tag and make sure the repository is public. Packagist reads versions from Git tags, so submit or refresh the repository at Packagist and verify that users can install the package with `composer require dvictorjhg/php-injector:^1.0`.
 

@@ -2,7 +2,7 @@ const translations = {
     en: {
         "document.title": "PHP Injector | Reflection-first dependency injection",
         "document.description": "A focused PHP dependency injector built around reflection, explicit arguments, attributes, providers, and predictable lifecycles.",
-        "brand.version": "v1.0.1",
+        "brand.version": "v1.0.2",
         "nav.guide": "Guide",
         "nav.lifecycle": "Lifecycle",
         "nav.resolution": "Resolution",
@@ -140,7 +140,7 @@ const translations = {
     es: {
         "document.title": "PHP Injector | Inyeccion de dependencias con reflexion",
         "document.description": "Un inyector de dependencias PHP centrado en reflexion, argumentos explicitos, atributos, proveedores y ciclos de vida predecibles.",
-        "brand.version": "v1.0.1",
+        "brand.version": "v1.0.2",
         "nav.guide": "Guia",
         "nav.lifecycle": "Ciclo de vida",
         "nav.resolution": "Resolucion",
