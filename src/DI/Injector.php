@@ -17,7 +17,7 @@ use ReflectionNamedType;
  * Resolve PHP classes and callables through reflection and provider lookup.
  *
  * The most recently constructed injector is active. When a new injector has
- * no explicit parent, it falls back through the previous active injector.
+ * no explicit parent, provider lookup continues through the previous active injector.
  * Automatically constructed classes are cached within their injector unless
  * their concrete class has the #[Transient] attribute.
  */
@@ -36,7 +36,7 @@ class Injector
     private readonly object $missingValue;
 
     /**
-     * Create an injector with optional providers and a parent fallback.
+     * Create an injector with optional providers and an optional parent injector.
      *
      * When no parent is supplied, the previously active injector becomes
      * this injector's parent. The new injector then becomes active.

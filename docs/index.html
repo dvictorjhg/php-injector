@@ -256,30 +256,13 @@ var_dump($first === $second);</code></pre>
                                         <p data-i18n="resolution.explicitPosition">position</p>
                                     </li>
                                 </ol>
-                                <div class="resolution-args-context">
-                                    <strong data-i18n="resolution.argsTitle">Contextual input</strong>
-                                    <p data-i18n-html="resolution.argsText"><code>$args</code> belongs to this call only; it is separate from the injector's persistent provider map.</p>
-                                    <pre><code>&lt;?php
-
-declare(strict_types=1);
-
-use PHPInjector\DI\Injector;
-
-$args = ['string' =&gt; 'cache'];
-$length = Injector::inject('strlen', $args);
-echo $length;</code></pre>
-                                    <div class="example-output">
-                                        <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                                        <pre><code>5</code></pre>
-                                    </div>
-                                </div>
                             </div>
                         </article>
                         <div class="resolution-connector"><span data-i18n="resolution.next">next</span></div>
                         <article class="resolution-stage resolution-stage-attribute">
                             <div class="resolution-stage-marker">
                                 <span class="resolution-index">02</span>
-                                <span class="resolution-kind" data-i18n="resolution.fallback">fallback</span>
+                                <span class="resolution-kind" data-i18n="resolution.attributeKind">attribute</span>
                             </div>
                             <div>
                                 <div class="resolution-stage-head">
@@ -307,7 +290,7 @@ echo $length;</code></pre>
                         <article class="resolution-stage resolution-stage-default">
                             <div class="resolution-stage-marker">
                                 <span class="resolution-index">04</span>
-                                <span class="resolution-kind" data-i18n="resolution.fallback">fallback</span>
+                                <span class="resolution-kind" data-i18n="resolution.defaultKind">default</span>
                             </div>
                             <div>
                                 <div class="resolution-stage-head">
@@ -328,13 +311,13 @@ echo $length;</code></pre>
                                     <h3 data-i18n="resolution.exception">InjectorException</h3>
                                     <span class="resolution-stage-tag" data-i18n="resolution.throw">throw</span>
                                 </div>
-                                <p data-i18n="resolution.exceptionText">A required parameter with no source fails loudly. There is no hidden fallback or service locator detour.</p>
+                                <p data-i18n="resolution.exceptionText">A required parameter with no source fails loudly. There is no hidden source or service locator detour.</p>
                             </div>
                         </article>
                     </div>
-                    <aside class="resolution-provider-lane">
+                    <aside class="resolution-provider-lane" aria-labelledby="resolution-provider-lane-title">
                         <span class="resolution-lane-label">02 + 03</span>
-                        <h3 data-i18n="resolution.providerLane">Provider search</h3>
+                        <h3 id="resolution-provider-lane-title" data-i18n="resolution.providerLane">Provider search</h3>
                         <p data-i18n="resolution.providerLaneText">The current injector is checked first, followed by each parent.</p>
                         <div class="provider-chain">
                             <span class="provider-node" data-i18n="resolution.providerCurrent">Current injector</span>
@@ -346,8 +329,130 @@ echo $length;</code></pre>
                         <p class="resolution-provider-footnote" data-i18n="resolution.providerFootnote">This order is also used while resolving providers whose values are themselves classes or callables.</p>
                     </aside>
                 </div>
-                <p class="muted resolution-note" data-i18n="resolution.note">One rule of thumb: make the ordinary path obvious, then use explicit arguments or attributes only where the graph needs a deliberate exception.</p>
-                <p class="muted resolution-types" data-i18n="resolution.types">Supported targets include class names, object/class method arrays, callable strings, closures, and invokable objects.</p>
+                <section class="resolution-step-one" aria-labelledby="resolution-step-one-title">
+                    <div class="resolution-detail-heading">
+                        <div>
+                            <span class="resolution-lane-label" data-i18n="resolution.stepOneLabel">Step 1 / Explicit arguments</span>
+                            <h3 id="resolution-step-one-title" data-i18n="resolution.alternativesTitle">Same dependency, three valid forms</h3>
+                        </div>
+                        <p class="muted" data-i18n-html="resolution.alternativesText">Step 1 maps the same dependency by type key, parameter name, or numeric position. Use one form per call.</p>
+                    </div>
+                    <div class="resolution-forms">
+                        <div class="resolution-form">
+                            <span class="resolution-form-index">01</span>
+                            <code>Logger::class =&gt; $logger</code>
+                            <span data-i18n="resolution.explicitType">type key</span>
+                        </div>
+                        <div class="resolution-form">
+                            <span class="resolution-form-index">02</span>
+                            <code>'logger' =&gt; $logger</code>
+                            <span data-i18n="resolution.explicitName">parameter name</span>
+                        </div>
+                        <div class="resolution-form">
+                            <span class="resolution-form-index">03</span>
+                            <code>0 =&gt; $logger</code>
+                            <span data-i18n="resolution.explicitPosition">numeric position</span>
+                        </div>
+                    </div>
+                    <div class="resolution-step-one-example">
+                        <div>
+                            <span class="resolution-lane-label" data-i18n="resolution.callsLabel">Same target, three calls</span>
+                            <pre><code>$byType = Injector::inject($target, [Logger::class =&gt; $logger]);
+$byName = Injector::inject($target, ['logger' =&gt; $logger]);
+$byPosition = Injector::inject($target, [$logger]);</code></pre>
+                        </div>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code>worker
+worker
+worker</code></pre>
+                        </div>
+                    </div>
+                </section>
+                <aside class="resolution-rejected" aria-labelledby="resolution-rejected-title">
+                    <div>
+                        <span class="resolution-lane-label" data-i18n="resolution.antiPatternLabel">Anti-pattern</span>
+                        <h3 id="resolution-rejected-title" data-i18n="resolution.rejectedTitle">Do not mix key styles</h3>
+                        <p class="muted" data-i18n-html="resolution.rejectedText">A type or parameter-name key cannot be combined with a numeric key. PHPInjector rejects the array before it invokes the target; it is not a fallback list.</p>
+                    </div>
+                    <div>
+                        <pre><code>Injector::inject($target, [
+    Logger::class =&gt; $logger,
+    0 =&gt; $logger,
+]);</code></pre>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code>The provided $args array contains mixed keys.</code></pre>
+                        </div>
+                    </div>
+                </aside>
+                <article class="guide-block resolution-full-example">
+                    <h3 data-i18n="resolution.fullExampleTitle">Full resolution in one target</h3>
+                    <p class="muted" data-i18n-html="resolution.fullExampleText">Run the same target twice: first with an explicit <code>report</code>, then without it. The first available source supplies each parameter, and the final call shows the required-parameter exception.</p>
+                    <div class="resolution-example-grid">
+                        <div>
+                            <span class="example-output-label" data-i18n="resolution.exampleCode">Example</span>
+                            <pre><code>&lt;?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Attributes\Inject;
+use PHPInjector\DI\Injector;
+use PHPInjector\Exceptions\InjectorException;
+
+final class Logger
+{
+    public function __construct(public string $channel = 'app')
+    {
+    }
+}
+
+final class ReportRunner
+{
+    public function run(
+        Logger $logger,
+        #[Inject('env')] string $environment,
+        string $report = 'summary',
+    ): string {
+        return "{$logger-&gt;channel}:{$environment}:{$report}";
+    }
+}
+
+$injector = new Injector([
+    Logger::class,
+    'env' =&gt; 'production',
+]);
+
+echo Injector::inject([ReportRunner::class, 'run'], [
+    'report' =&gt; 'sales',
+]) . PHP_EOL;
+echo Injector::inject([ReportRunner::class, 'run']) . PHP_EOL;
+
+$required = static fn (string $token): string =&gt; $token;
+
+try {
+    Injector::inject($required);
+} catch (InjectorException $exception) {
+    echo $exception-&gt;getMessage();
+}</code></pre>
+                        </div>
+                        <div>
+                            <div class="example-output">
+                                <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                                <pre><code>app:production:sales
+app:production:summary
+No provider or value found for parameter: $token at position 0.</code></pre>
+                            </div>
+                            <ol class="resolution-example-steps">
+                                <li data-i18n-html="resolution.stepExplicit"><code>$report</code> uses the explicit per-call <code>$args</code> value.</li>
+                                <li data-i18n-html="resolution.stepAttribute"><code>$environment</code> uses <code>#[Inject('env')]</code> to find <code>production</code>.</li>
+                                <li data-i18n-html="resolution.stepTyped"><code>$logger</code> uses the registered <code>Logger</code> provider.</li>
+                                <li data-i18n-html="resolution.stepDefault">The second call uses the PHP default <code>summary</code> for <code>$report</code>.</li>
+                                <li data-i18n-html="resolution.stepException"><code>$token</code> has no source, so PHPInjector throws <code>InjectorException</code>.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </article>
             </div>
         </section>
 

@@ -24,7 +24,7 @@ The [PHPInjector documentation page](https://dvictorjhg.github.io/php-injector/)
 - Supports PSR-11 container access for simple provider storage.
 - Allows lazy class registration, concrete instances, alias-style mappings, and named scalar values.
 - Supports scalar or contextual values through explicit arguments or `#[Inject]`.
-- Supports parent injector fallback for provider composition.
+- Supports provider composition through parent injectors.
 - Supports singleton-style providers through a dedicated contract.
 - Uses implicit singleton caching by default, with a class-level `#[Transient]` attribute for opt-in transient resolution.
 - Provides `Injector::inject()` and `PHPInjector\DI\inject()` global entry points backed by the active injector staircase.
@@ -386,13 +386,13 @@ bool(false)
 bool(false)
 ```
 
-Unlike the `Singleton` contract, the `#[Transient]` attribute is an injector-managed opt-out from the default cache. Each injector has its own local cache, while a newly constructed injector can fall back through the active injector staircase.
+Unlike the `Singleton` contract, the `#[Transient]` attribute is an injector-managed opt-out from the default cache. Each injector has its own local cache, while a newly constructed injector can continue provider lookup through the active injector staircase.
 
 The attribute does not override an explicitly supplied provider object or a class's `Singleton::getInstance()` implementation. Static injection always uses the most recently constructed injector.
 
 ### Example #8 Compose providers with a parent injector
 
-A child injector checks its own providers first and then falls back through its parent chain:
+A child injector checks its own providers first and then continues through its parent chain:
 
 ```php
 <?php
@@ -495,11 +495,11 @@ api,worker
 
 ### Resolution order
 
-#### What `$args` means here
+#### Same dependency, three valid forms
 
 In `Injector::inject($target, $args)`, `$args` is the optional map of values supplied for one injection call. It is separate from the reusable provider map passed to `new Injector([...])`; the target still declares its own parameters, and PHPInjector uses the `$args` keys to match them.
 
-For a target with a `Logger $logger` parameter, these are alternative ways to pass the same value. In every call, the array after `$target` is the per-call `$args` map:
+For a target with a `Logger $logger` parameter, these three calls pass the same value and print the same result. Choose one key style per call:
 
 ```php
 <?php
@@ -518,9 +518,13 @@ final class Logger
 $logger = new Logger('worker');
 $target = static fn (Logger $logger): string => $logger->channel;
 
-echo Injector::inject($target, [Logger::class => $logger]) . PHP_EOL;
-echo Injector::inject($target, ['logger' => $logger]) . PHP_EOL;
-echo Injector::inject($target, [$logger]) . PHP_EOL;
+$byType = Injector::inject($target, [Logger::class => $logger]);
+$byName = Injector::inject($target, ['logger' => $logger]);
+$byPosition = Injector::inject($target, [$logger]);
+
+echo $byType . PHP_EOL;
+echo $byName . PHP_EOL;
+echo $byPosition . PHP_EOL;
 ```
 
 **Expected output:**
@@ -529,6 +533,42 @@ echo Injector::inject($target, [$logger]) . PHP_EOL;
 worker
 worker
 worker
+```
+
+Do not combine key styles in one `$args` array. PHPInjector rejects mixed integer and string keys before it invokes the target; the array is not a fallback list:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use PHPInjector\DI\Injector;
+use PHPInjector\Exceptions\InjectorException;
+
+final class Logger
+{
+    public function __construct(public string $channel)
+    {
+    }
+}
+
+$logger = new Logger('worker');
+$target = static fn (Logger $logger): string => $logger->channel;
+
+try {
+    Injector::inject($target, [
+        Logger::class => $logger,
+        0 => $logger,
+    ]);
+} catch (InjectorException $exception) {
+    echo $exception->getMessage();
+}
+```
+
+**Expected failure output:**
+
+```text
+The provided $args array contains mixed keys.
 ```
 
 The same meaning applies when the target is a PHP built-in callable:
@@ -607,7 +647,7 @@ flowchart TD
     position -->|No| miss([No explicit argument match])
 ```
 
-#### Example
+#### Full resolution example
 
 ```php
 <?php
@@ -616,6 +656,7 @@ declare(strict_types=1);
 
 use PHPInjector\DI\Attributes\Inject;
 use PHPInjector\DI\Injector;
+use PHPInjector\Exceptions\InjectorException;
 
 final class Logger
 {
@@ -642,20 +683,33 @@ $injector = new Injector([
 
 echo Injector::inject([ReportRunner::class, 'run'], [
     'report' => 'sales',
-]);
+]) . PHP_EOL;
+echo Injector::inject([ReportRunner::class, 'run']) . PHP_EOL;
+
+$required = static fn (string $token): string => $token;
+
+try {
+    Injector::inject($required);
+} catch (InjectorException $exception) {
+    echo $exception->getMessage();
+}
 ```
 
 **Expected output:**
 
 ```text
 app:production:sales
+app:production:summary
+No provider or value found for parameter: $token at position 0.
 ```
 
 In that call:
 
-1. `Logger $logger` is resolved from the typed provider lookup.
+1. In the first call, `string $report` is resolved from the explicit per-call argument.
 2. `#[Inject('env')] string $environment` is resolved from the named provider.
-3. `string $report` is resolved from the explicit per-call argument.
+3. `Logger $logger` is resolved from the typed provider lookup.
+4. In the second call, `string $report` has no explicit value, so its PHP default, `summary`, is used.
+5. `$token` has no argument, `#[Inject]` provider, typed provider, or default, so PHPInjector throws `InjectorException`.
 
 ## Container Support
 

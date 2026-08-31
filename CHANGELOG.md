@@ -32,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `#[Inject]` attribute support for named value resolution.
 - Singleton provider support through `PHPInjector\Contracts\Singleton`.
 - Implicit singleton caching for automatically constructed classes, with a `#[Transient]` class-level opt-out for fresh resolution.
-- Parent injector fallback for composing provider maps.
+- Provider composition through parent injectors.
 - Type-key provider resolution for named classes, interfaces, abstract classes, enum instances, and `Closure` values.
 - Variadic parameter resolution with zero-or-more values, positional expansion, and list-valued providers.
 - Explicit-only handling for union, intersection, and DNF parameter types to avoid ambiguous provider selection.

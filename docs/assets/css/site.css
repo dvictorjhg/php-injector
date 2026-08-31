@@ -124,8 +124,7 @@ pre code {
 }
 
 .code-example .example-output,
-.quickstart .example-output,
-.resolution-args-context .example-output {
+.quickstart .example-output {
     margin-top: 0;
 }
 
@@ -851,36 +850,23 @@ html[data-theme="dark"] .lifecycle-item code {
 }
 
 .resolution-choice p,
-.resolution-args-context p,
 .resolution-variadic-note span {
     color: #9ebdb2;
     font-size: 0.84rem;
 }
 
-.resolution-args-context,
 .resolution-variadic-note {
     display: grid;
-    gap: 10px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #396666;
-}
-
-.resolution-args-context strong,
-.resolution-variadic-note strong {
-    color: var(--white);
-    font-size: 0.84rem;
-}
-
-.resolution-args-context pre {
-    font-size: 0.72rem;
-}
-
-.resolution-variadic-note {
     grid-template-columns: auto minmax(0, 1fr);
     gap: 10px;
     margin-top: 14px;
     padding-top: 14px;
+    border-top: 1px solid #396666;
+}
+
+.resolution-variadic-note strong {
+    color: var(--white);
+    font-size: 0.84rem;
 }
 
 .resolution-connector {
@@ -960,17 +946,145 @@ html[data-theme="dark"] .lifecycle-item code {
     font-size: 0.78rem !important;
 }
 
-.resolution-note,
-.resolution-types {
-    max-width: 980px;
+.resolution-step-one {
+    margin-top: 42px;
+    padding-top: 24px;
+    border-top: 1px solid #396666;
 }
 
-.resolution-note {
-    margin: 24px 0 0;
+.resolution-detail-heading {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+    gap: 40px;
+    align-items: end;
 }
 
-.resolution-types {
-    margin: 12px 0 0;
+.resolution-detail-heading h3 {
+    margin: 10px 0 0;
+    color: var(--white);
+    font-size: 1.35rem;
+}
+
+.resolution-detail-heading p {
+    max-width: 620px;
+    margin: 0;
+    color: #bdd2c8;
+    font-size: 0.92rem;
+}
+
+.resolution-forms {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.resolution-form {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px 12px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid #396666;
+    background: #153a3a;
+}
+
+.resolution-form-index {
+    color: var(--yellow);
+    font-family: "Space Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.resolution-form code {
+    grid-column: 2;
+    overflow-wrap: anywhere;
+    color: var(--yellow);
+    background: #254c4c;
+}
+
+.resolution-form > span:last-child {
+    grid-column: 2;
+    color: #9ebdb2;
+    font-size: 0.8rem;
+}
+
+.resolution-step-one-example {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+    gap: 22px;
+    align-items: start;
+    margin-top: 16px;
+}
+
+.resolution-step-one-example .resolution-lane-label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.resolution-step-one-example .example-output {
+    margin-top: 0;
+}
+
+.resolution-rejected {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+    gap: 28px;
+    align-items: center;
+    margin-top: 28px;
+    padding: 20px 0;
+    border-top: 1px solid #396666;
+    border-bottom: 1px solid #396666;
+}
+
+.resolution-rejected .resolution-lane-label {
+    color: var(--coral-on-dark);
+}
+
+.resolution-rejected h3 {
+    margin: 10px 0 8px;
+    color: var(--white);
+    font-size: 1.15rem;
+}
+
+.resolution-rejected p {
+    margin: 0;
+    color: #bdd2c8;
+    font-size: 0.92rem;
+}
+
+.resolution-rejected .example-output {
+    margin-top: 12px;
+}
+
+.resolution-full-example {
+    margin-top: 38px;
+}
+
+.resolution-example-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+    gap: 28px;
+    margin-top: 22px;
+}
+
+.resolution-example-grid > * {
+    min-width: 0;
+}
+
+.resolution-example-grid .example-output {
+    margin-top: 0;
+}
+
+.resolution-example-steps {
+    margin: 18px 0 0;
+    padding-left: 1.35rem;
+    color: #bdd2c8;
+    font-size: 0.92rem;
+}
+
+.resolution-example-steps li + li {
+    margin-top: 8px;
 }
 
 .targets-grid {
@@ -1151,6 +1265,13 @@ footer p {
         position: static;
     }
 
+    .resolution-detail-heading,
+    .resolution-step-one-example,
+    .resolution-rejected {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
     .lifecycle-grid {
         grid-template-columns: 1fr;
     }
@@ -1214,7 +1335,8 @@ footer p {
     }
 
     .guide-grid,
-    .api-grid {
+    .api-grid,
+    .resolution-example-grid {
         grid-template-columns: 1fr;
         gap: 38px;
     }
