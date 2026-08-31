@@ -1272,6 +1272,10 @@ footer p {
         gap: 22px;
     }
 
+    .resolution-step-one-example > * {
+        min-width: 0;
+    }
+
     .lifecycle-grid {
         grid-template-columns: 1fr;
     }
@@ -1339,6 +1343,10 @@ footer p {
     .resolution-example-grid {
         grid-template-columns: 1fr;
         gap: 38px;
+    }
+
+    .resolution-forms {
+        grid-template-columns: 1fr;
     }
 
     .provider-table th,
