@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title description">
+  <title id="title">PHPInjector</title>
+  <desc id="description">PHPInjector, reflection-based dependency injection for modern PHP</desc>
+  <rect width="1200" height="360" rx="24" fill="#f7fbfa" />
+  <rect width="16" height="360" fill="#e46550" />
+  <g transform="translate(92 78) scale(5.1)">
+    <path d="M4 20h18" fill="none" stroke="#e46550" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+    <path d="M16 14l6 6-6 6" fill="none" stroke="#e46550" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+    <path d="M28 8v24" fill="none" stroke="#0a716c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+    <path d="M28 12h8" fill="none" stroke="#4d72d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+    <path d="M28 28h8" fill="none" stroke="#efc85b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+    <circle cx="36" cy="12" r="2" fill="#4d72d6" />
+    <circle cx="36" cy="28" r="2" fill="#efc85b" />
+  </g>
+  <text x="350" y="166" fill="#173b3a" font-family="Trebuchet MS, sans-serif" font-size="78" font-weight="700"><tspan fill="#e46550">PHP</tspan>Injector</text>
+  <text x="354" y="220" fill="#0a716c" font-family="Trebuchet MS, sans-serif" font-size="28" font-weight="700">Reflection-based dependency injection</text>
+  <text x="354" y="266" fill="#4a5c60" font-family="Trebuchet MS, sans-serif" font-size="22">PSR-11 container | Attributes | Singleton support</text>
+</svg>

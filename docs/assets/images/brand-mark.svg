@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 40 40" role="img" aria-labelledby="title">
+  <title id="title">PHPInjector logo</title>
+  <path d="M4 20h18" fill="none" stroke="#e46550" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+  <path d="M16 14l6 6-6 6" fill="none" stroke="#e46550" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+  <path d="M28 8v24" fill="none" stroke="#0a716c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+  <path d="M28 12h8" fill="none" stroke="#4d72d6" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+  <path d="M28 28h8" fill="none" stroke="#efc85b" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" />
+  <circle cx="36" cy="12" r="2" fill="#4d72d6" />
+  <circle cx="36" cy="28" r="2" fill="#efc85b" />
+</svg>

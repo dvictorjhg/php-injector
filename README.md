@@ -1,5 +1,7 @@
 # PHPInjector
 
+![PHPInjector](docs/assets/images/brand-header.svg)
+
 [![Latest Version on Packagist][badge-packagist-version]][packagist]
 [![Monthly Downloads on Packagist][badge-packagist-downloads]][packagist]
 [![Total Downloads on Packagist][badge-packagist-total-downloads]][packagist]
