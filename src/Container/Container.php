@@ -63,27 +63,16 @@ class Container implements ContainerInterface, Countable, IteratorAggregate
             return $value::class;
         }
 
-        throw new ContainerException(
-            "Invalid key($key) => value(" . $this->stringifyInvalidValue($value) . ').'
-        );
-    }
-
-    /**
-     * Keep invalid list-entry errors readable without changing the original value.
-     */
-    private function stringifyInvalidValue(mixed $value): string
-    {
         if ($value === null) {
-            return 'null';
+            $valueString = 'null';
+        } elseif (\is_bool($value)) {
+            $valueString = $value ? 'true' : 'false';
+        } else {
+            $valueString = $value;
+            \settype($valueString, 'string');
         }
 
-        if (\is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        \settype($value, 'string');
-
-        return $value;
+        throw new ContainerException("Invalid key($key) => value($valueString).");
     }
 
     /**

@@ -34,8 +34,21 @@ final class InjectorHelper
             throw new InjectorException('Non-injectable injection target provided.');
         }
 
-        if (!empty($args) && self::arrayHasMixedKeys($args)) {
-            throw new InjectorException('The provided $args array contains mixed keys.');
+        if ($args !== []) {
+            $hasIntegerKeys = false;
+            $hasStringKeys = false;
+
+            foreach (\array_keys($args) as $key) {
+                if (\is_int($key)) {
+                    $hasIntegerKeys = true;
+                } elseif (\is_string($key)) {
+                    $hasStringKeys = true;
+                }
+
+                if ($hasIntegerKeys && $hasStringKeys) {
+                    throw new InjectorException('The provided $args array contains mixed keys.');
+                }
+            }
         }
     }
 
@@ -288,28 +301,4 @@ final class InjectorHelper
         return $reflectionClass->getAttributes(Transient::class) !== [];
     }
 
-    /**
-     * Detect a mixture of integer and string keys in an argument array.
-     *
-     * @param array<mixed> $arr
-     */
-    private static function arrayHasMixedKeys(array $arr): bool
-    {
-        $hasIntegerKeys = false;
-        $hasStringKeys = false;
-
-        foreach (\array_keys($arr) as $key) {
-            if (\is_int($key)) {
-                $hasIntegerKeys = true;
-            } elseif (\is_string($key)) {
-                $hasStringKeys = true;
-            }
-
-            if ($hasIntegerKeys && $hasStringKeys) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
