@@ -1,4 +1,4 @@
-import translations from './translations.js';
+import translations from './translations.js?v=20261011-2';
 
 const themeStorageKey = 'phpinjector-theme';
 const languageStorageKey = 'phpinjector-language';
@@ -25,7 +25,8 @@ const writeStorage = (key, value) => {
 const updateHeaderOffset = () => {
     const header = document.querySelector('.site-header');
     if (header) {
-        root.style.setProperty('--site-header-height', `${header.getBoundingClientRect().height}px`);
+        const height = getComputedStyle(header).position === 'sticky' ? header.getBoundingClientRect().height : 0;
+        root.style.setProperty('--site-header-height', `${height}px`);
     }
 };
 
@@ -45,7 +46,11 @@ const initializeSectionNavigation = () => {
         frameId = undefined;
 
         const header = document.querySelector('.site-header');
-        const activationLine = (header?.getBoundingClientRect().bottom ?? 0) + 24;
+        const headerBottom = header && getComputedStyle(header).position === 'sticky'
+            ? header.getBoundingClientRect().bottom
+            : 0;
+        const anchorOffset = Number.parseFloat(getComputedStyle(root).getPropertyValue('--section-anchor-offset'));
+        const activationLine = headerBottom + anchorOffset + 1;
         let currentSection = sections[0];
 
         const isAtPageBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;

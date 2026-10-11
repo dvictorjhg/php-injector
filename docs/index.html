@@ -8,10 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css">
-    <script type="module" src="assets/js/site.js"></script>
+    <link rel="stylesheet" href="assets/css/site.css?v=20261011-2">
+    <script type="module" src="assets/js/site.js?v=20261011-2"></script>
 </head>
 <body>
+    <a class="skip-link" href="#guide" data-i18n="nav.skip">Skip to documentation</a>
     <header class="site-header">
         <div class="wrap nav">
             <div class="nav-brand">
@@ -56,6 +57,7 @@
                 <a href="#lifecycle" data-i18n="nav.lifecycle">Lifecycle</a>
                 <a href="#resolution" data-i18n="nav.resolution">Resolution</a>
                 <a href="#targets" data-i18n="nav.targets">Targets</a>
+                <a href="#recipes" data-i18n="nav.recipes">Recipes</a>
                 <a href="#api" data-i18n="nav.api">API</a>
                 <a href="#development" data-i18n="nav.development">Development</a>
                 <a class="nav-github" href="https://github.com/dvictorjhg/php-injector">GitHub</a>
@@ -67,7 +69,7 @@
         <section class="hero">
             <div class="wrap hero-inner">
                 <p class="eyebrow" data-i18n="hero.eyebrow">PHP 8.3+ / PSR-11</p>
-                <h1 data-i18n="hero.title">Injection without the fog.</h1>
+                <h1 data-i18n="hero.title">PHPInjector</h1>
                 <p class="hero-lede" data-i18n="hero.lede">A compact dependency injector for classes and callables. Reflection does the inspection; you decide the explicit inputs, providers, and lifecycle.</p>
                 <div class="hero-actions">
                     <a class="button-link" href="#guide" data-i18n="hero.readGuide">Read the guide</a>
@@ -75,9 +77,11 @@
                 </div>
                 <div class="quickstart">
                     <span class="quickstart-label" data-i18n="hero.quickstartLabel">A useful first line</span>
-                    <pre><code data-i18n="hero.quickstartCode">&lt;?php
+                    <pre><code data-example="quickstart">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -89,7 +93,7 @@ $service = Injector::inject(MyService::class);
 echo get_class($service);</code></pre>
                     <div class="example-output">
                         <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                        <pre><code>MyService</code></pre>
+                        <pre><code data-output-for="quickstart">MyService</code></pre>
                     </div>
                 </div>
             </div>
@@ -112,10 +116,12 @@ echo get_class($service);</code></pre>
                     </article>
                     <article class="guide-block">
                         <h3 data-i18n="guide.providersTitle">Providers</h3>
-                        <p data-i18n="guide.providersText">A provider is a value or factory stored under an identifier. Types are the natural default; named identifiers are useful for interfaces and configuration.</p>
-                        <pre><code data-i18n="guide.providersCode">&lt;?php
+                        <p data-i18n="guide.providersText">A provider is a stored value or a lazy class string. Closures are supplied as values, not executed as factories.</p>
+                        <pre><code data-example="providers">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -133,7 +139,7 @@ $injector-&gt;addProvider('db.dsn', $dsn);
 echo Injector::inject('db.dsn');</code></pre>
                         <div class="example-output">
                             <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                            <pre><code>mysql:host=db;dbname=app</code></pre>
+                            <pre><code data-output-for="providers">mysql:host=db;dbname=app</code></pre>
                         </div>
                     </article>
                 </div>
@@ -165,7 +171,7 @@ echo Injector::inject('db.dsn');</code></pre>
                     <span class="callout-mark" aria-hidden="true">!</span>
                     <div>
                         <strong data-i18n="guide.noteTitle">One container, one graph</strong>
-                        <p data-i18n="guide.noteText">Child injectors consult their own providers first, then walk toward the parent. A provider is never silently pulled from an unrelated global container.</p>
+                        <p data-i18n="guide.noteText">A new injector becomes globally active. It checks local providers first, then its explicit parent or the previously active injector. Constructing an empty injector does not reset the chain.</p>
                     </div>
                 </div>
             </div>
@@ -194,9 +200,11 @@ echo Injector::inject('db.dsn');</code></pre>
                         <p data-i18n-html="lifecycle.overrideText">Pass an explicit instance when one resolution needs a fresh dependency. <code>#[Transient]</code> applies to the whole class and does not replace <code>Singleton</code>.</p>
                     </article>
                 </div>
-                <pre class="lifecycle-code"><code>&lt;?php
+                <pre class="lifecycle-code"><code data-example="transient">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Attributes\Transient;
 use PHPInjector\DI\Injector;
@@ -212,7 +220,7 @@ $second = Injector::inject(RequestStamp::class);
 var_dump($first === $second);</code></pre>
                 <div class="example-output">
                     <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                    <pre><code>bool(false)</code></pre>
+                    <pre><code data-output-for="transient">bool(false)</code></pre>
                 </div>
             </div>
         </section>
@@ -326,7 +334,7 @@ var_dump($first === $second);</code></pre>
                             <span class="provider-chain-arrow" aria-hidden="true">&#8595;</span>
                             <span class="provider-node" data-i18n="resolution.providerEnd">No provider</span>
                         </div>
-                        <p class="resolution-provider-footnote" data-i18n="resolution.providerFootnote">This order is also used while resolving providers whose values are themselves classes or callables.</p>
+                        <p class="resolution-provider-footnote" data-i18n="resolution.providerFootnote">Class-string providers are resolved lazily. Closures and other supplied values are returned unchanged, not invoked as factories.</p>
                     </aside>
                 </div>
                 <section class="resolution-step-one" aria-labelledby="resolution-step-one-title">
@@ -357,13 +365,31 @@ var_dump($first === $second);</code></pre>
                     <div class="resolution-step-one-example">
                         <div>
                             <span class="resolution-lane-label" data-i18n="resolution.callsLabel">Same target, three calls</span>
-                            <pre><code>$byType = Injector::inject($target, [Logger::class =&gt; $logger]);
+                            <pre><code data-example="argument-forms">&lt;?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPInjector\DI\Injector;
+
+final class Logger
+{
+    public function __construct(public string $channel)
+    {
+    }
+}
+
+$logger = new Logger('worker');
+$target = static fn (Logger $logger): string =&gt; $logger-&gt;channel;
+$byType = Injector::inject($target, [Logger::class =&gt; $logger]);
 $byName = Injector::inject($target, ['logger' =&gt; $logger]);
-$byPosition = Injector::inject($target, [$logger]);</code></pre>
+$byPosition = Injector::inject($target, [$logger]);
+echo $byType . PHP_EOL . $byName . PHP_EOL . $byPosition;</code></pre>
                         </div>
                         <div class="example-output">
                             <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                            <pre><code>worker
+                            <pre><code data-output-for="argument-forms">worker
 worker
 worker</code></pre>
                         </div>
@@ -376,13 +402,24 @@ worker</code></pre>
                         <p class="muted" data-i18n-html="resolution.rejectedText">A type or parameter-name key cannot be combined with a numeric key. PHPInjector rejects the array before it invokes the target; it is not a fallback list.</p>
                     </div>
                     <div>
-                        <pre><code>Injector::inject($target, [
-    Logger::class =&gt; $logger,
-    0 =&gt; $logger,
-]);</code></pre>
+                        <pre><code data-example="mixed-keys">&lt;?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPInjector\DI\Injector;
+use PHPInjector\Exceptions\InjectorException;
+
+$target = static fn (string $name): string =&gt; $name;
+try {
+    Injector::inject($target, ['name' =&gt; 'Ada', 0 =&gt; 'Ada']);
+} catch (InjectorException $exception) {
+    echo $exception-&gt;getMessage();
+}</code></pre>
                         <div class="example-output">
                             <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                            <pre><code>The provided $args array contains mixed keys.</code></pre>
+                            <pre><code data-output-for="mixed-keys">The provided $args array contains mixed keys.</code></pre>
                         </div>
                     </div>
                 </aside>
@@ -392,9 +429,11 @@ worker</code></pre>
                     <div class="resolution-example-grid">
                         <div>
                             <span class="example-output-label" data-i18n="resolution.exampleCode">Example</span>
-                            <pre><code>&lt;?php
+                            <pre><code data-example="resolution">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Attributes\Inject;
 use PHPInjector\DI\Injector;
@@ -439,7 +478,7 @@ try {
                         <div>
                             <div class="example-output">
                                 <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                                <pre><code>app:production:sales
+                                <pre><code data-output-for="resolution">app:production:sales
 app:production:summary
 No provider or value found for parameter: $token at position 0.</code></pre>
                             </div>
@@ -489,9 +528,11 @@ No provider or value found for parameter: $token at position 0.</code></pre>
                         </li>
                     </ul>
                     <div class="code-example">
-                    <pre><code>&lt;?php
+                    <pre><code data-example="callables">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -515,7 +556,7 @@ echo Injector::inject('ReportJobs::warm') . PHP_EOL;
 echo Injector::inject(static fn (Logger $logger): string =&gt; $logger-&gt;channel);</code></pre>
                     <div class="example-output">
                         <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                        <pre><code>warming app
+                        <pre><code data-output-for="callables">warming app
 app</code></pre>
                     </div>
                     </div>
@@ -523,9 +564,11 @@ app</code></pre>
                 <div class="targets-variadic">
                     <h3 data-i18n="targets.variadicTitle">Variadics stay positional</h3>
                     <p data-i18n-html="targets.variadicText">For <code>function sum(int ...$values)</code>, numeric values from the variadic position onward are collected and passed as separate arguments.</p>
-                    <pre><code data-i18n="targets.variadicCode">&lt;?php
+                    <pre><code data-example="variadic">&lt;?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -535,8 +578,133 @@ echo Injector::inject(
 );</code></pre>
                     <div class="example-output">
                         <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
-                        <pre><code>10</code></pre>
+                        <pre><code data-output-for="variadic">10</code></pre>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="recipes">
+            <div class="wrap">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-number" data-i18n="recipes.label">Recipes / Executable examples</span>
+                        <h2 data-i18n="recipes.title">Providers, containers, and boundaries.</h2>
+                    </div>
+                    <p data-i18n="recipes.lede">Run each complete PHP example independently from the project root after composer install. The documentation check compares actual output with the output shown here.</p>
+                </div>
+                <div class="guide-grid">
+                    <article class="guide-block">
+                        <h3 data-i18n="recipes.aliasTitle">Alias an interface and inject configuration</h3>
+                        <p data-i18n="recipes.aliasText">Register constructor dependencies explicitly. Direct class targets can be constructed without registration, but their required typed parameters need providers.</p>
+                        <pre><code data-example="alias">&lt;?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPInjector\DI\Attributes\Inject;
+use PHPInjector\DI\Injector;
+
+interface Formatter
+{
+    public function format(string $value): string;
+}
+
+final class TextFormatter implements Formatter
+{
+    public function format(string $value): string
+    {
+        return strtoupper($value);
+    }
+}
+
+final class Report
+{
+    public function __construct(
+        public Formatter $formatter,
+        #[Inject('env')] public string $environment,
+    ) {
+    }
+}
+
+$injector = new Injector([
+    Formatter::class =&gt; TextFormatter::class,
+    'env' =&gt; 'production',
+]);
+$report = Injector::inject(Report::class);
+echo $report-&gt;formatter-&gt;format($report-&gt;environment) . PHP_EOL;
+var_dump(Injector::inject(TextFormatter::class) === $report-&gt;formatter);</code></pre>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code data-output-for="alias">PRODUCTION
+bool(true)</code></pre>
+                        </div>
+                    </article>
+                    <article class="guide-block">
+                        <h3 data-i18n="recipes.containerTitle">Use the PSR-11 store directly</h3>
+                        <p data-i18n="recipes.containerText">Container stores values without constructing classes or invoking closures. Null is a present value; missing identifiers throw NotFoundException. set() replaces entries and unset() removes them.</p>
+                        <pre><code data-example="container">&lt;?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPInjector\Container\Container;
+use Psr\Container\NotFoundExceptionInterface;
+
+$container = new Container(['env' =&gt; 'dev', 'optional' =&gt; null]);
+var_dump($container-&gt;has('optional'));
+$container-&gt;set('env', 'production');
+echo $container-&gt;get('env') . PHP_EOL;
+$container-&gt;unset('env');
+echo count($container) . PHP_EOL;
+try {
+    $container-&gt;get('env');
+} catch (NotFoundExceptionInterface $exception) {
+    echo $exception-&gt;getMessage();
+}</code></pre>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code data-output-for="container">bool(true)
+production
+1
+No entry was found for env identifier.</code></pre>
+                        </div>
+                    </article>
+                    <article class="guide-block">
+                        <h3 data-i18n="recipes.closureTitle">Inject a closure as a value</h3>
+                        <p data-i18n="recipes.closureText">Resolving a closure provider returns the closure itself. Invoke it in your consumer, or pass a callable directly to Injector::inject() to execute it with resolved parameters.</p>
+                        <pre><code data-example="closure-provider">&lt;?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPInjector\DI\Injector;
+
+$format = static fn (string $value): string =&gt; strtoupper($value);
+$injector = new Injector([Closure::class =&gt; $format]);
+var_dump(Injector::inject(Closure::class) === $format);
+echo Injector::inject(
+    static fn (Closure $format): string =&gt; $format('ready'),
+);</code></pre>
+                        <div class="example-output">
+                            <span class="example-output-label" data-i18n="example.expectedOutput">Expected output</span>
+                            <pre><code data-output-for="closure-provider">bool(true)
+READY</code></pre>
+                        </div>
+                    </article>
+                    <article class="guide-block">
+                        <h3 data-i18n="recipes.boundaryTitle">Resolution and lifecycle limits</h3>
+                        <div data-i18n-html="recipes.boundaries"><ul>
+                            <li>Only registered non-builtin named types are looked up automatically. Scalars, callable, untyped, union, intersection, and DNF parameters need explicit arguments, #[Inject], or defaults.</li>
+                            <li>The newest injector is globally active. A null parent uses the previous injector; it does not create an isolated root.</li>
+                            <li>Cached objects ignore later constructor arguments. Use #[Transient] or supply the dependency object explicitly when identity must change.</li>
+                            <li>No cycle detection or request scope is provided. Do not create circular provider aliases or dependency graphs.</li>
+                            <li>Keep long-running workers free of request-specific cached services. Singleton::getInstance() is managed by your class, not reset by the injector.</li>
+                        </ul></div>
+                    </article>
                 </div>
             </div>
         </section>
@@ -556,21 +724,21 @@ echo Injector::inject(
                 <div class="api-grid">
                     <div class="api-column">
                         <details open>
-                            <summary><code>Injector::addProvider()</code></summary>
-                            <p data-i18n="api.addProviderText">Store a value, class string, or callable factory under a string identifier.</p>
+                            <summary><code>$injector-&gt;addProvider(string $id, mixed $value): void</code></summary>
+                            <p data-i18n="api.addProviderText">Register or replace a stored value or lazy class string in this injector.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
                         </details>
-                        <details>
-                            <summary><code>Injector::getProvider()</code></summary>
-                            <p data-i18n="api.getProviderText">Read a provider from the current injector or its parent chain. Missing identifiers throw a container exception.</p>
+                        <details open>
+                            <summary><code>new Injector(array|Container $providers = [], ?Injector $parent = null)</code></summary>
+                            <p data-i18n="api.getProviderText">Creates the active injector. The default parent is the previously active injector; an explicit parent selects another chain.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
                         </details>
-                        <details>
-                            <summary><code>Injector::hasProvider()</code></summary>
-                            <p data-i18n="api.hasProviderText">Check whether an identifier exists in the current injector or its parent chain.</p>
+                        <details open>
+                            <summary><code>Injector::inject($target, array $args = []): mixed</code></summary>
+                            <p data-i18n="api.hasProviderText">Resolves through the active injector. Missing string targets or required parameters raise InjectorException. There is no public getProvider() or hasProvider() API.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Injector.php" data-i18n="api.source">Source</a>
                         </details>
-                        <details>
+                        <details open>
                             <summary><code>PHPInjector\DI\inject()</code></summary>
                             <p data-i18n-html="api.functionText">Global function entry point for <code>Injector::inject()</code>.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/functions.php" data-i18n="api.source">Source</a>
@@ -587,14 +755,14 @@ echo Injector::inject(
                             <p data-i18n="api.injectAttributeText">Annotate one parameter with a named provider identifier.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Inject.php" data-i18n="api.source">Source</a>
                         </details>
-                        <details>
+                        <details open>
                             <summary><code>#[Transient]</code></summary>
                             <p data-i18n="api.transientAttributeText">Override singleton caching for one class declaration.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/DI/Attributes/Transient.php" data-i18n="api.source">Source</a>
                         </details>
-                        <details>
+                        <details open>
                             <summary><code>Singleton</code></summary>
-                            <p data-i18n="api.singletonText">Implement the marker interface to cache the constructed concrete instance.</p>
+                            <p data-i18n-html="api.singletonText">Implement getInstance() to supply a class-managed shared instance.</p>
                             <a class="source-link" href="https://github.com/dvictorjhg/php-injector/blob/main/src/Contracts/Singleton.php" data-i18n="api.source">Source</a>
                         </details>
                     </div>
@@ -614,9 +782,14 @@ echo Injector::inject(
                 <div class="development-grid">
                     <div>
                         <h3 data-i18n="development.commandsTitle">Commands</h3>
-                        <pre><code>composer analyse
+                        <pre><code>composer validate --strict
+composer check-platform-reqs
+php tools/check-docs.php
+composer analyse
 composer test
-composer test:coverage</code></pre>
+composer test:coverage
+composer coverage:check</code></pre>
+                        <p data-i18n="development.docsCheck">The documentation check requires PHP DOM and proc_open. It executes marked HTML examples and README examples with expected output in separate PHP processes. Coverage additionally requires Xdebug or PCOV.</p>
                     </div>
                     <div>
                         <h3 data-i18n="development.linksTitle">Project links</h3>

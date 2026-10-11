@@ -17,7 +17,11 @@ PHPInjector exists for projects that want constructor and method injection witho
 
 ## Documentation
 
-The [PHPInjector documentation page](https://dvictorjhg.github.io/php-injector/) is the visual entry point for installation, common injection targets, provider lifecycles, parameter resolution, and the public API. It is a static GitHub Pages site with relative CSS and JavaScript assets under `/docs/assets`. It defaults to English and the light theme; both preferences can be changed from the header and persist in the browser. This README remains the copy-and-paste reference for the full examples.
+The [PHPInjector documentation page](https://dvictorjhg.github.io/php-injector/) covers installation, injection targets, provider lifecycles, parameter resolution, the public API, and [executable recipes](https://dvictorjhg.github.io/php-injector/#recipes). The responsive static site defaults to English and the light theme, with English/Spanish and theme preferences in the header. All guide content is readable without JavaScript.
+
+Run each complete PHP example independently from the project root after installing
+dependencies. Examples reuse class names and are not intended to be combined into
+one file. Every complete example includes the Composer autoloader.
 
 ## Why Use PHPInjector
 
@@ -54,6 +58,8 @@ The examples below stay in the same small reporting domain and add one feature a
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -106,6 +112,8 @@ You can register a lazy class, an alias mapping, a prebuilt object, and a named 
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -167,6 +175,8 @@ PHPInjector can resolve more than constructors. The next example uses an instanc
 
 declare(strict_types=1);
 
+require __DIR__ . '/vendor/autoload.php';
+
 use PHPInjector\DI\Injector;
 
 final class Logger
@@ -214,7 +224,8 @@ warming app
 
 Callables can be provided as closures, array callables, callable strings, global function names, or first-class callables.
 
-In the `strlen` call, `$args` is the second argument passed to `Injector::inject()`. The `string` key matches the parameter of the built-in callable; it is not a provider registration.
+The built-in `strlen` example in [Resolution order](#resolution-order) demonstrates
+parameter-name arguments for a global function.
 
 ### Example #4 Bind scalar values explicitly
 
@@ -224,6 +235,8 @@ Scalar values can be passed directly per call when no provider should supply the
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -261,6 +274,8 @@ When a scalar or context value should come from the injector, bind it explicitly
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Attributes\Inject;
 use PHPInjector\DI\Injector;
@@ -308,6 +323,8 @@ If a provider implements `PHPInjector\Contracts\Singleton`, the injector calls `
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\Contracts\Singleton;
 use PHPInjector\DI\Injector;
@@ -357,6 +374,8 @@ Classes use injector-managed singleton caching by default. Add `#[Transient]` to
 
 declare(strict_types=1);
 
+require __DIR__ . '/vendor/autoload.php';
+
 use PHPInjector\DI\Injector;
 
 use PHPInjector\DI\Attributes\Transient;
@@ -400,6 +419,8 @@ A child injector checks its own providers first and then continues through its p
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -448,6 +469,8 @@ Named non-builtin types can use providers keyed by their type. A `Closure` provi
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -508,6 +531,8 @@ For a target with a `Logger $logger` parameter, these three calls pass the same 
 
 declare(strict_types=1);
 
+require __DIR__ . '/vendor/autoload.php';
+
 use PHPInjector\DI\Injector;
 
 final class Logger
@@ -544,6 +569,8 @@ Do not combine key styles in one `$args` array. PHPInjector rejects mixed intege
 
 declare(strict_types=1);
 
+require __DIR__ . '/vendor/autoload.php';
+
 use PHPInjector\DI\Injector;
 use PHPInjector\Exceptions\InjectorException;
 
@@ -579,6 +606,8 @@ The same meaning applies when the target is a PHP built-in callable:
 <?php
 
 declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPInjector\DI\Injector;
 
@@ -656,6 +685,8 @@ flowchart TD
 
 declare(strict_types=1);
 
+require __DIR__ . '/vendor/autoload.php';
+
 use PHPInjector\DI\Attributes\Inject;
 use PHPInjector\DI\Injector;
 use PHPInjector\Exceptions\InjectorException;
@@ -717,6 +748,41 @@ In that call:
 
 The package includes `PHPInjector\Container\Container`, a PSR-11 compatible container for direct storage and retrieval of providers. It is intentionally small and can also be used without the injector when all you need is provider registration and lookup.
 
+- `get(string $id)` returns the stored value unchanged, including class strings
+    and closures. It does not construct or execute providers.
+- `has(string $id)` returns true for present entries, even when the value is null.
+- `set(string $id, mixed $value)` replaces an entry; `unset(string $id)` removes it.
+- `count()` and iteration expose the locally stored entries, not an injector's
+    parent chain.
+- Missing entries throw `PHPInjector\Container\NotFoundException`, implementing
+    PSR-11's `NotFoundExceptionInterface`. Duplicate normalized identifiers or
+    invalid list-style values throw `ContainerException`.
+
+See the [verified container recipe](https://dvictorjhg.github.io/php-injector/#recipes).
+
+## Boundaries And Troubleshooting
+
+- **A typed constructor parameter is unresolved:** register that type, map its
+    interface to a concrete class, or supply an explicit argument. Resolving a
+    class target directly does not recursively autowire unregistered parameter types.
+- **A closure provider did not run:** providers are values, not factories.
+    Invoke the injected closure in your consumer, or pass a callable as the target
+    of `Injector::inject()` to execute it with resolved arguments.
+- **New constructor arguments had no effect:** the class may already be cached.
+    Use `#[Transient]` or explicitly supply a dependency object when fresh identity
+    is required. Registered objects are always returned as supplied.
+- **Old providers are still visible:** the newest injector is globally active;
+    an omitted or null parent links to the previous injector. There is no public
+    reset, isolated-root switch, or request-scoped container API.
+- **Circular graphs:** cycle detection is not provided. Avoid circular aliases
+    and constructor dependency cycles.
+- **Long-running workers:** do not retain request-specific data in cached
+    services. A class-managed `Singleton::getInstance()` is not reset by the injector.
+- **Public API:** use `new Injector(...)`, `$injector->addProvider(...)`,
+    `Injector::inject(...)`, or the `inject(...)` function. `getProvider()` is
+    private and there is no public `hasProvider()` method. Use `Container` for
+    direct `get()`/`has()` access.
+
 ## Quality
 
 The main CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml) uses [GitHub Actions](https://github.com/features/actions) on PHP 8.3, 8.4, and 8.5 to validate [Composer](https://getcomposer.org/) metadata, run [PHPStan](https://phpstan.org/) static analysis, execute the [PHPUnit](https://phpunit.de/) suite with [Xdebug](https://xdebug.org/) coverage enabled, publish the Clover report to [Codecov](https://codecov.io/gh/dvictorjhg/php-injector), and fail the build if statement coverage drops below 80%.
@@ -739,6 +805,7 @@ Install dependencies and run the test suite:
 
 ```bash
 composer install
+php tools/check-docs.php
 composer analyse
 composer test
 ```
@@ -749,6 +816,11 @@ To run the same coverage checks enforced in CI:
 composer test:coverage
 composer coverage:check
 ```
+
+The documentation check needs PHP DOM and `proc_open`. It executes marked HTML
+examples and README examples with expected output in isolated PHP processes and
+compares exact output. Xdebug is disabled only in these child processes so
+`var_dump()` produces standard PHP output. Coverage runs need Xdebug or PCOV.
 
 ## Contributing
 
