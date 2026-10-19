@@ -203,6 +203,36 @@ final class InjectorTest extends TestCase
     }
 
     #[Group(self::TEST_CLASS_INJECTION)]
+    public function testInheritedAliasUsesParentProviderForDirectAndTypedResolution(): void
+    {
+        $parentProvider = $this->simpleProvider('parent-injector');
+        $parent = $this->createInjector([
+            Provider::class => SimpleProvider::class,
+            SimpleProvider::class => $parentProvider,
+        ]);
+        $child = $this->createInjector([
+            SimpleProvider::class => $this->simpleProvider('child-injector'),
+        ], $parent);
+
+        $direct = $child->inject(Provider::class);
+        $typed = $child->inject([Methods::class, 'staticMethodWithProviderClassParameter']);
+
+        $this->assertSame($parentProvider, $direct);
+        $this->assertSame($direct, $typed);
+    }
+
+    #[Group(self::TEST_CLASS_INJECTION)]
+    public function testChildAliasReusesConcreteInstanceCachedInParent(): void
+    {
+        $parent = $this->createInjector([SimpleProvider::class]);
+        $original = $parent->inject(SimpleProvider::class);
+        $child = $this->createInjector([Provider::class => SimpleProvider::class], $parent);
+
+        $this->assertSame($original, $child->inject(Provider::class));
+        $this->assertSame($original, $child->inject(SimpleProvider::class));
+    }
+
+    #[Group(self::TEST_CLASS_INJECTION)]
     public function testInjectAliasedProviderFromParentForTypedDependencySharesConcreteCache(): void
     {
         $parentInjector = $this->createInjector([Provider::class => SimpleProvider::class]);

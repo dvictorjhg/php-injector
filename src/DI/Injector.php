@@ -186,11 +186,12 @@ class Injector
      */
     private function resolveStringTarget(string $injectionTarget, array $args): mixed
     {
-        $provider = $this->getProvider($injectionTarget);
+        $owner = null;
+        $provider = $this->getProvider($injectionTarget, owner: $owner);
 
         if ($provider !== $this->missingValue) {
             if (\is_string($provider) && \class_exists($provider)) {
-                return $this->instantiateAndStore($injectionTarget, $args, $provider);
+                return ($owner ?? $this)->instantiateAndStore($injectionTarget, $args, $provider);
             }
 
             return $provider;
@@ -222,10 +223,10 @@ class Injector
         $reflectionClass = new ReflectionClass($resolvedClassName);
         $isTransient = InjectorHelper::isTransient($reflectionClass);
 
-        if (!$isTransient && $this->providers->has($resolvedClassName)) {
-            $instance = $this->providers->get($resolvedClassName);
+        if (!$isTransient) {
+            $instance = $this->getProvider($resolvedClassName);
 
-            if (\is_object($instance)) {
+            if ($instance !== $this->missingValue && \is_object($instance)) {
                 if ($storageId !== $resolvedClassName) {
                     $this->addProvider($storageId, $instance);
                 }
@@ -402,12 +403,13 @@ class Injector
      * Class-string providers requested for non-builtin typed parameters are
      * resolved before being returned so their concrete instance can be cached.
      */
-    private function getProvider(string $id, ?ReflectionNamedType $type = null): mixed
+    private function getProvider(string $id, ?ReflectionNamedType $type = null, ?self &$owner = null): mixed
     {
         $injector = $this;
 
         while ($injector instanceof self) {
             if ($injector->providers->has($id)) {
+                $owner = $injector;
                 $provider = $injector->providers->get($id);
 
                 if (

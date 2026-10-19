@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=20261011-2">
-    <script type="module" src="assets/js/site.js?v=20261011-2"></script>
+    <link rel="stylesheet" href="assets/css/site.css?v=20261019-2">
+    <script type="module" src="assets/js/site.js?v=20261019-3"></script>
 </head>
 <body>
     <a class="skip-link" href="#guide" data-i18n="nav.skip">Skip to documentation</a>
@@ -28,7 +28,7 @@
                     </svg>
                     <span class="brand-copy">
                         <span class="brand-name"><span class="brand-prefix">PHP</span> Injector</span>
-                        <span class="version" data-i18n="brand.version">v1.0.2</span>
+                        <span class="version" data-i18n="brand.version">v1.0.3</span>
                     </span>
                 </a>
                 <div class="nav-tools">
@@ -112,7 +112,7 @@ echo get_class($service);</code></pre>
                     <article class="guide-block">
                         <h3 data-i18n="guide.installTitle">Install</h3>
                         <p data-i18n="guide.installText">The runtime has one dependency: the PSR-11 container contract.</p>
-                        <pre><code>composer require dvictorjhg/php-injector</code></pre>
+                        <pre><code class="language-bash">composer require dvictorjhg/php-injector</code></pre>
                     </article>
                     <article class="guide-block">
                         <h3 data-i18n="guide.providersTitle">Providers</h3>
@@ -782,7 +782,7 @@ READY</code></pre>
                 <div class="development-grid">
                     <div>
                         <h3 data-i18n="development.commandsTitle">Commands</h3>
-                        <pre><code>composer validate --strict
+                        <pre><code class="language-bash">composer validate --strict
 composer check-platform-reqs
 php tools/check-docs.php
 composer analyse
@@ -790,6 +790,8 @@ composer test
 composer test:coverage
 composer coverage:check</code></pre>
                         <p data-i18n="development.docsCheck">The documentation check requires PHP DOM and proc_open. It executes marked HTML examples and README examples with expected output in separate PHP processes. Coverage additionally requires Xdebug or PCOV.</p>
+                        <p data-i18n="development.customizeText">Use composer test -- --filter InjectorTest for focused tests. Override the coverage report and threshold with composer coverage:check -- build/test-results/clover.xml 90. PHPUnit and PHPStan accept custom --configuration paths; these settings do not change provider lifecycles.</p>
+                        <p data-i18n="development.releaseText">Prepare PHPInjector 1.0.3 by aligning the changelog, citation, and documentation versions. Run every check above, review composer audit, and inspect composer archive. Tag and publish only after verification, before the dependent BraidPHP release.</p>
                     </div>
                     <div>
                         <h3 data-i18n="development.linksTitle">Project links</h3>

@@ -2,20 +2,26 @@
 
 declare(strict_types=1);
 
-if ($argc !== 3) {
-    fwrite(STDERR, "Usage: php tools/check-coverage.php <clover-file> <minimum-percent>\n");
+if ($argc !== 1 && $argc !== 3) {
+    fwrite(STDERR, "Usage: php tools/check-coverage.php [<clover-file> <minimum-percent>]\n");
     exit(1);
 }
 
-[, $cloverFile, $minimumPercent] = $argv;
+$cloverFile = $argv[1] ?? 'build/test-results/clover.xml';
+$minimumPercent = $argv[2] ?? '80';
 
 if (!is_file($cloverFile)) {
     fwrite(STDERR, "Coverage file not found: {$cloverFile}\n");
     exit(1);
 }
 
-if (!is_numeric($minimumPercent)) {
-    fwrite(STDERR, "Minimum coverage must be numeric.\n");
+if (
+    !is_numeric($minimumPercent)
+    || !is_finite((float) $minimumPercent)
+    || (float) $minimumPercent < 0
+    || (float) $minimumPercent > 100
+) {
+    fwrite(STDERR, "Minimum coverage must be a finite number between 0 and 100.\n");
     exit(1);
 }
 

@@ -166,6 +166,10 @@ bool(true)
 
 Class-string providers and alias mappings are instantiated lazily and cached after first resolution unless the resolved class uses `#[Transient]`. Aliases and direct class resolution share the cached instance for the same automatically resolved concrete class.
 
+Inherited aliases resolve within the injector that registered them, for both
+direct requests and typed parameters. A child alias can reuse a concrete instance
+already cached in its parent unless the child overrides that concrete provider.
+
 ### Example #3 Inject methods and other callables
 
 PHPInjector can resolve more than constructors. The next example uses an instance method, a closure, and a callable string:
@@ -785,6 +789,8 @@ See the [verified container recipe](https://dvictorjhg.github.io/php-injector/#r
 
 ## Quality
 
+CI also runs `php tools/check-docs.php` on PHP 8.5 to verify executable examples.
+
 The main CI workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml) uses [GitHub Actions](https://github.com/features/actions) on PHP 8.3, 8.4, and 8.5 to validate [Composer](https://getcomposer.org/) metadata, run [PHPStan](https://phpstan.org/) static analysis, execute the [PHPUnit](https://phpunit.de/) suite with [Xdebug](https://xdebug.org/) coverage enabled, publish the Clover report to [Codecov](https://codecov.io/gh/dvictorjhg/php-injector), and fail the build if statement coverage drops below 80%.
 
 Before the first upload, enable the repository in Codecov. Public pull requests from forks can upload from an unprotected branch without a token, but uploads for protected branches and all private repositories require a Codecov token unless token authentication for public repositories has been disabled in Codecov's **Global Upload Token** settings. For the reliable protected-branch path, add the repository token as a GitHub Actions secret named `CODECOV_TOKEN` under **Settings > Secrets and variables > Actions**. Keep it in GitHub Secrets rather than committing it to the repository. If the repository is private, copy the tokenized badge URL from Codecov's **Badges & Graphs** settings and replace the badge image URL above.
@@ -797,7 +803,7 @@ Before the first upload, enable the repository in Codecov. Public pull requests 
 - [PHPStan](https://phpstan.org/) for static analysis, executed through `composer analyse`.
 - [PHPUnit](https://phpunit.de/) for the unit test suite and Clover coverage report generation through `composer test:coverage`.
 - [Xdebug](https://xdebug.org/) for code coverage in CI and local coverage runs.
-- [tools/check-coverage.php](tools/check-coverage.php) for enforcing the minimum 80% statement coverage threshold from the generated Clover XML.
+- [tools/check-coverage.php](tools/check-coverage.php) for enforcing a configurable statement coverage threshold, defaulting to 80%, from a Clover XML report.
 
 ## Local Development
 
@@ -822,6 +828,25 @@ examples and README examples with expected output in isolated PHP processes and
 compares exact output. Xdebug is disabled only in these child processes so
 `var_dump()` produces standard PHP output. Coverage runs need Xdebug or PCOV.
 
+### Customize Development Tools
+
+Composer forwards arguments after `--`. The coverage checker defaults to
+`build/test-results/clover.xml` and 80%. To override it, supply both the report
+path and a finite percentage between 0 and 100:
+
+```bash
+composer test -- --filter InjectorTest
+composer coverage:check -- build/test-results/clover.xml 90
+vendor/bin/phpstan analyse --configuration=phpstan.neon.dist
+vendor/bin/phpunit --configuration=phpunit.xml --filter ContainerTest
+```
+
+Select your own configuration files using the same flags. To customize coverage
+output, run `vendor/bin/phpunit --coverage-clover /tmp/clover.xml` with a coverage
+driver enabled, then pass that file to the checker. These development settings
+do not affect provider caching or injection behavior; configure those through
+provider registrations, explicit arguments, `#[Inject]`, and `#[Transient]`.
+
 ## Contributing
 
 Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, test expectations, and pull request guidance.
@@ -834,13 +859,24 @@ Please report vulnerabilities privately as described in [SECURITY.md](SECURITY.m
 
 ## Changelog
 
-Release notes for the first public release and future unreleased changes live in [CHANGELOG.md](CHANGELOG.md).
+Release notes live in [CHANGELOG.md](CHANGELOG.md).
 
 ## Release / Publishing
 
-For a release, update [CHANGELOG.md](CHANGELOG.md), validate the package with `composer validate --strict`, `composer analyse`, and `composer test`, then create and push an annotated Git tag such as `1.0.2`.
+The next release is **1.0.3**. Finalize the dated entry in
+[CHANGELOG.md](CHANGELOG.md), align [CITATION.cff](CITATION.cff) and the English
+and Spanish documentation version labels, then run `composer validate --strict`,
+`composer check-platform-reqs`, `php tools/check-docs.php`, `composer analyse`,
+`composer test:coverage`, and `composer coverage:check`. Review `composer audit`
+and inspect a `composer archive` build before creating the annotated tag `1.0.3`.
+No tag, push, or publication is part of local release preparation.
 
-After the tag is on GitHub, publish a GitHub Release for that tag and make sure the repository is public. Packagist reads versions from Git tags, so submit or refresh the repository at Packagist and verify that users can install the package with `composer require dvictorjhg/php-injector:^1.0`.
+After the tag is on GitHub, publish a GitHub Release and refresh Packagist.
+Packagist reads versions from Git tags, so do not add a `version` field to
+`composer.json`. Verify `composer require dvictorjhg/php-injector:^1.0.3` in a
+clean application before publishing the dependent BraidPHP release. Existing
+registrations remain supported; inherited aliases now resolve consistently
+within their owning injector and child aliases reuse parent-cached instances.
 
 ## License And Attribution
 

@@ -119,6 +119,46 @@ pre code {
     font-size: inherit;
 }
 
+.hljs {
+    --syntax-keyword: #ffae96;
+    --syntax-string: #8cd8c1;
+    --syntax-number: #f3d16c;
+    --syntax-title: #9bbdf5;
+    --syntax-comment: #adc0b8;
+}
+
+.hljs-keyword,
+.hljs-meta,
+.hljs-selector-tag {
+    color: var(--syntax-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+    color: var(--syntax-string);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable {
+    color: var(--syntax-number);
+}
+
+.hljs-title,
+.hljs-built_in,
+.hljs-type,
+.hljs-attr,
+.hljs-attribute {
+    color: var(--syntax-title);
+}
+
+.hljs-comment,
+.hljs-quote {
+    color: var(--syntax-comment);
+}
+
 .code-example {
     display: grid;
     gap: 14px;

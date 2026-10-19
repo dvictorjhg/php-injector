@@ -26,6 +26,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
+          extensions: dom
           coverage: xdebug
 
       - name: Validate composer configuration
@@ -33,6 +34,10 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Verify executable documentation
+        if: matrix.php-version == '8.5'
+        run: php tools/check-docs.php
 
       - name: Run static analysis
         run: composer analyse

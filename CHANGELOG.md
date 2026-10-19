@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+## [1.0.3] - 2026-10-19
+
+### Added
+
+- Locally bundled Highlight.js 11.12.0 documentation syntax highlighting with light/dark colors and an explicitly registered HTTP grammar.
+
+### Fixed
+
+- Resolve inherited aliases consistently through their owning injector for direct and typed injection.
+- Reuse parent-cached concrete instances when resolving child aliases.
+
+### Changed
+
+- Verify executable documentation in CI on PHP 8.5.
+- Allow custom coverage report paths and thresholds through Composer while retaining the default 80% gate; reject invalid percentages.
+- Exclude local dependencies, generated reports, environment files, and local lockfiles from Composer archives.
+- Refresh current documentation versions, citation metadata, and release verification guidance.
+
 ## [1.0.2] - 2026-08-31
 
 ### Changed

@@ -1,4 +1,6 @@
-import translations from './translations.js?v=20261011-2';
+import translations from './translations.js?v=20261019-1';
+import hljs from './highlight.min.js?v=11.12.0';
+import http from './http.min.js?v=11.12.0';
 
 const themeStorageKey = 'phpinjector-theme';
 const languageStorageKey = 'phpinjector-language';
@@ -160,6 +162,17 @@ const initialize = () => {
 
     applyTheme(readStorage(themeStorageKey) ?? root.dataset.theme ?? 'light', false);
     applyLanguage(readStorage(languageStorageKey) ?? defaultLanguage, false);
+    hljs.registerLanguage('http', http);
+    hljs.configure({ languages: ['php', 'bash', 'json', 'yaml', 'http', 'ini'] });
+    document.querySelectorAll('pre code:not([data-output-for])').forEach((code) => {
+        if (code.closest('.example-output')) {
+            return;
+        }
+        if (code.matches('[data-example], [data-example-file]')) {
+            code.classList.add('language-php');
+        }
+        hljs.highlightElement(code);
+    });
     updateHeaderOffset();
     initializeSectionNavigation();
 };

@@ -34,13 +34,7 @@ Generating autoload files
 composer test
 ```
 
-The above example will output:
-
-```text
-PHPUnit 11.x by Sebastian Bergmann and contributors.
-
-OK (111 tests, 221 assertions)
-```
+The suite should finish with `OK`; test and assertion counts vary by checkout.
 
 If you switch branches, move files, or see repeated `Class ... not found` errors during the test run, refresh Composer autoload files and rerun the suite:
 
@@ -48,6 +42,12 @@ If you switch branches, move files, or see repeated `Class ... not found` errors
 composer dump-autoload
 composer test
 ```
+
+Run `php tools/check-docs.php` as well.
+Customize test selection with `composer test -- --filter InjectorTest` and
+coverage with `composer coverage:check -- build/test-results/clover.xml 90`.
+Use PHPUnit's and PHPStan's `--configuration` flags for your own tool settings.
+The full release checklist is in the README.
 
 ## Development Expectations
 
@@ -97,7 +97,7 @@ The above example gives reviewers the problem, the behavior change, and the veri
 ## Environment
 
 - PHP: 8.3.x, 8.4.x, or 8.5.x
-- Package: 1.0.2, dev-main, or commit SHA
+- Package: 1.0.3, dev-main, or commit SHA
 
 ## Reproducer
 
@@ -119,7 +119,7 @@ The injector returns `int(5)`.
 
 ## Actual Behavior
 
-The injector throws an exception.
+Paste the observed incorrect result or exception, including the stack trace.
 ````
 
 The above example gives maintainers enough detail to reproduce the problem quickly.
