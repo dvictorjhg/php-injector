@@ -34,6 +34,8 @@ class Injector
      */
     private readonly Container $providers;
     private readonly object $missingValue;
+    /** @var array<class-string, true> */
+    private array $resolving = [];
 
     /**
      * Create an injector with optional providers and an optional parent injector.
@@ -235,7 +237,16 @@ class Injector
             }
         }
 
-        $instance = $this->injectObject($resolvedClassName, $args);
+        if (isset($this->resolving[$resolvedClassName])) {
+            throw new InjectorException("Circular dependency detected while resolving '$resolvedClassName'.");
+        }
+
+        $this->resolving[$resolvedClassName] = true;
+        try {
+            $instance = $this->injectObject($resolvedClassName, $args);
+        } finally {
+            unset($this->resolving[$resolvedClassName]);
+        }
 
         /** @var object $instance */
         if (!$isTransient) {

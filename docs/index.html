@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/site.css?v=20261019-2">
-    <script type="module" src="assets/js/site.js?v=20261019-3"></script>
+    <script type="module" src="assets/js/site.js?v=20261019-6"></script>
 </head>
 <body>
     <a class="skip-link" href="#guide" data-i18n="nav.skip">Skip to documentation</a>
@@ -28,7 +28,7 @@
                     </svg>
                     <span class="brand-copy">
                         <span class="brand-name"><span class="brand-prefix">PHP</span> Injector</span>
-                        <span class="version" data-i18n="brand.version">v1.0.3</span>
+                        <span class="version" data-i18n="brand.version">v1.0.4</span>
                     </span>
                 </a>
                 <div class="nav-tools">
@@ -701,7 +701,7 @@ READY</code></pre>
                             <li>Only registered non-builtin named types are looked up automatically. Scalars, callable, untyped, union, intersection, and DNF parameters need explicit arguments, #[Inject], or defaults.</li>
                             <li>The newest injector is globally active. A null parent uses the previous injector; it does not create an isolated root.</li>
                             <li>Cached objects ignore later constructor arguments. Use #[Transient] or supply the dependency object explicitly when identity must change.</li>
-                            <li>No cycle detection or request scope is provided. Do not create circular provider aliases or dependency graphs.</li>
+                            <li>Circular construction raises InjectorException; resolution state is cleared after failure so corrected dependencies can be retried. No request scope is provided.</li>
                             <li>Keep long-running workers free of request-specific cached services. Singleton::getInstance() is managed by your class, not reset by the injector.</li>
                         </ul></div>
                     </article>
@@ -791,7 +791,7 @@ composer test:coverage
 composer coverage:check</code></pre>
                         <p data-i18n="development.docsCheck">The documentation check requires PHP DOM and proc_open. It executes marked HTML examples and README examples with expected output in separate PHP processes. Coverage additionally requires Xdebug or PCOV.</p>
                         <p data-i18n="development.customizeText">Use composer test -- --filter InjectorTest for focused tests. Override the coverage report and threshold with composer coverage:check -- build/test-results/clover.xml 90. PHPUnit and PHPStan accept custom --configuration paths; these settings do not change provider lifecycles.</p>
-                        <p data-i18n="development.releaseText">Prepare PHPInjector 1.0.3 by aligning the changelog, citation, and documentation versions. Run every check above, review composer audit, and inspect composer archive. Tag and publish only after verification, before the dependent BraidPHP release.</p>
+                        <p data-i18n="development.releaseText">For each release, align the changelog, citation, and documentation versions. Run every check above, review composer audit, and inspect composer archive. Tag and publish only after verification, before any dependent BraidPHP release.</p>
                     </div>
                     <div>
                         <h3 data-i18n="development.linksTitle">Project links</h3>

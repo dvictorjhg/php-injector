@@ -778,8 +778,9 @@ See the [verified container recipe](https://dvictorjhg.github.io/php-injector/#r
 - **Old providers are still visible:** the newest injector is globally active;
     an omitted or null parent links to the previous injector. There is no public
     reset, isolated-root switch, or request-scoped container API.
-- **Circular graphs:** cycle detection is not provided. Avoid circular aliases
-    and constructor dependency cycles.
+- **Circular graphs:** recursive construction raises `InjectorException` instead
+    of exhausting the PHP stack or memory. Resolution state is cleared after
+    failure, so correcting a provider or supplying an explicit dependency allows retry.
 - **Long-running workers:** do not retain request-specific data in cached
     services. A class-managed `Singleton::getInstance()` is not reset by the injector.
 - **Public API:** use `new Injector(...)`, `$injector->addProvider(...)`,
@@ -863,20 +864,19 @@ Release notes live in [CHANGELOG.md](CHANGELOG.md).
 
 ## Release / Publishing
 
-The next release is **1.0.3**. Finalize the dated entry in
+For each release, finalize the dated entry in
 [CHANGELOG.md](CHANGELOG.md), align [CITATION.cff](CITATION.cff) and the English
 and Spanish documentation version labels, then run `composer validate --strict`,
 `composer check-platform-reqs`, `php tools/check-docs.php`, `composer analyse`,
 `composer test:coverage`, and `composer coverage:check`. Review `composer audit`
-and inspect a `composer archive` build before creating the annotated tag `1.0.3`.
+and inspect a `composer archive` build before creating the annotated version tag.
 No tag, push, or publication is part of local release preparation.
 
 After the tag is on GitHub, publish a GitHub Release and refresh Packagist.
 Packagist reads versions from Git tags, so do not add a `version` field to
-`composer.json`. Verify `composer require dvictorjhg/php-injector:^1.0.3` in a
-clean application before publishing the dependent BraidPHP release. Existing
-registrations remain supported; inherited aliases now resolve consistently
-within their owning injector and child aliases reuse parent-cached instances.
+`composer.json`. Verify the intended version constraint in a clean application
+before publishing a dependent BraidPHP release. Release-specific behavior belongs
+in the changelog.
 
 ## License And Attribution
 

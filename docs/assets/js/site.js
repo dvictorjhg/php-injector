@@ -1,4 +1,4 @@
-import translations from './translations.js?v=20261019-1';
+import translations from './translations.js?v=20261019-4';
 import hljs from './highlight.min.js?v=11.12.0';
 import http from './http.min.js?v=11.12.0';
 

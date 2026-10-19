@@ -2,7 +2,7 @@ const translations = {
     en: {
         "document.title": "PHP Injector | Reflection-first dependency injection",
         "document.description": "A focused PHP dependency injector built around reflection, explicit arguments, attributes, providers, and predictable lifecycles.",
-        "brand.version": "v1.0.3",
+        "brand.version": "v1.0.4",
         "nav.guide": "Guide",
         "nav.lifecycle": "Lifecycle",
         "nav.resolution": "Resolution",
@@ -140,7 +140,7 @@ const translations = {
     es: {
         "document.title": "PHP Injector | Inyeccion de dependencias con reflexion",
         "document.description": "Un inyector de dependencias PHP centrado en reflexion, argumentos explicitos, atributos, proveedores y ciclos de vida predecibles.",
-        "brand.version": "v1.0.3",
+        "brand.version": "v1.0.4",
         "nav.guide": "Guia",
         "nav.lifecycle": "Ciclo de vida",
         "nav.resolution": "Resolucion",
@@ -290,10 +290,10 @@ Object.assign(translations.en, {
     "recipes.closureTitle": "Inject a closure as a value",
     "recipes.closureText": "Resolving a closure provider returns the closure itself. Invoke it in your consumer, or pass a callable directly to Injector::inject() to execute it with resolved parameters.",
     "recipes.boundaryTitle": "Resolution and lifecycle limits",
-    "recipes.boundaries": `<ul><li>Only registered non-builtin named types are looked up automatically. Scalars, callable, untyped, union, intersection, and DNF parameters need explicit arguments, #[Inject], or defaults.</li><li>The newest injector is globally active. A null parent uses the previous injector; it does not create an isolated root.</li><li>Cached objects ignore later constructor arguments. Use #[Transient] or supply the dependency object explicitly when identity must change.</li><li>No cycle detection or request scope is provided. Do not create circular provider aliases or dependency graphs.</li><li>Keep long-running workers free of request-specific cached services. Singleton::getInstance() is managed by your class, not reset by the injector.</li></ul>`,
+    "recipes.boundaries": `<ul><li>Only registered non-builtin named types are looked up automatically. Scalars, callable, untyped, union, intersection, and DNF parameters need explicit arguments, #[Inject], or defaults.</li><li>The newest injector is globally active. A null parent uses the previous injector; it does not create an isolated root.</li><li>Cached objects ignore later constructor arguments. Use #[Transient] or supply the dependency object explicitly when identity must change.</li><li>Circular construction raises InjectorException; resolution state is cleared after failure so corrected dependencies can be retried. No request scope is provided.</li><li>Keep long-running workers free of request-specific cached services. Singleton::getInstance() is managed by your class, not reset by the injector.</li></ul>`,
     "development.docsCheck": "The documentation check requires PHP DOM and proc_open. It executes marked HTML examples and README examples with expected output in separate PHP processes. Coverage additionally requires Xdebug or PCOV.",
     "development.customizeText": "Use composer test -- --filter InjectorTest for focused tests. Override the coverage report and threshold with composer coverage:check -- build/test-results/clover.xml 90. PHPUnit and PHPStan accept custom --configuration paths; these settings do not change provider lifecycles.",
-    "development.releaseText": "Prepare PHPInjector 1.0.3 by aligning the changelog, citation, and documentation versions. Run every check above, review composer audit, and inspect composer archive. Tag and publish only after verification, before the dependent BraidPHP release."
+    "development.releaseText": "For each release, align the changelog, citation, and documentation versions. Run every check above, review composer audit, and inspect composer archive. Tag and publish only after verification, before any dependent BraidPHP release."
 });
 
 Object.assign(translations.es, {
@@ -309,10 +309,10 @@ Object.assign(translations.es, {
     "recipes.closureTitle": "Inyecta una closure como valor",
     "recipes.closureText": "Resolver un proveedor closure devuelve la propia closure. Invocala en el consumidor, o pasa un callable directamente a Injector::inject() para ejecutarlo con parametros resueltos.",
     "recipes.boundaryTitle": "Limites de resolucion y ciclo de vida",
-    "recipes.boundaries": `<ul><li>Solo se buscan automaticamente los tipos con nombre no incorporados que esten registrados. Los escalares, callable, parametros sin tipo, uniones, intersecciones y DNF necesitan argumentos explicitos, #[Inject] o valores predeterminados.</li><li>El ultimo inyector queda activo globalmente. Un padre null utiliza el anterior; no crea una raiz aislada.</li><li>Los objetos en cache ignoran los argumentos posteriores del constructor. Usa #[Transient] o proporciona la dependencia explicitamente para cambiar la identidad.</li><li>No hay deteccion de ciclos ni ambito de peticion. Evita alias de proveedores y dependencias circulares.</li><li>No almacenes datos de peticion en servicios compartidos de procesos persistentes. Tu clase gestiona Singleton::getInstance(); el inyector no lo reinicia.</li></ul>`,
+    "recipes.boundaries": `<ul><li>Solo se buscan automaticamente los tipos con nombre no incorporados que esten registrados. Los escalares, callable, parametros sin tipo, uniones, intersecciones y DNF necesitan argumentos explicitos, #[Inject] o valores predeterminados.</li><li>El ultimo inyector queda activo globalmente. Un padre null utiliza el anterior; no crea una raiz aislada.</li><li>Los objetos en cache ignoran los argumentos posteriores del constructor. Usa #[Transient] o proporciona la dependencia explicitamente para cambiar la identidad.</li><li>La construccion circular lanza InjectorException; el estado se limpia tras el fallo para permitir reintentos con dependencias corregidas. No hay ambito de peticion.</li><li>No almacenes datos de peticion en servicios compartidos de procesos persistentes. Tu clase gestiona Singleton::getInstance(); el inyector no lo reinicia.</li></ul>`,
     "development.docsCheck": "La comprobacion requiere PHP DOM y proc_open. Ejecuta los ejemplos HTML marcados y los del README con salida esperada en procesos PHP separados. La cobertura necesita ademas Xdebug o PCOV.",
     "development.customizeText": "Usa composer test -- --filter InjectorTest para pruebas enfocadas. Cambia informe y umbral con composer coverage:check -- build/test-results/clover.xml 90. PHPUnit y PHPStan aceptan rutas --configuration propias; no cambian los ciclos de vida de proveedores.",
-    "development.releaseText": "Prepara PHPInjector 1.0.3 alineando changelog, cita y versiones de documentacion. Ejecuta las comprobaciones, revisa composer audit e inspecciona composer archive. Crea el tag y publica solo tras verificar, antes de la release dependiente de BraidPHP."
+    "development.releaseText": "Para cada release, alinea changelog, cita y versiones de documentacion. Ejecuta las comprobaciones, revisa composer audit e inspecciona composer archive. Crea el tag y publica solo tras verificar, antes de cualquier release dependiente de BraidPHP."
 });
 
 export default translations;

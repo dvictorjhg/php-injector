@@ -795,6 +795,25 @@ final class InjectorTest extends TestCase
     }
 
     #[Group(self::TEST_INJECTOR_EXCEPTION)]
+    public function testCircularDependenciesFailWithoutPoisoningLaterResolution(): void
+    {
+        $injector = $this->createInjector([CircularProvider::class]);
+
+        try {
+            Injector::inject(CircularProvider::class);
+            $this->fail('Circular dependencies must be rejected.');
+        } catch (InjectorException $exception) {
+            $this->assertStringContainsString('Circular dependency detected', $exception->getMessage());
+            $this->assertStringContainsString(CircularProvider::class, $exception->getMessage());
+        }
+
+        $resolved = Injector::inject(CircularProvider::class, ['dependency' => null]);
+        $this->assertInstanceOf(CircularProvider::class, $resolved);
+        $this->assertNull($resolved->dependency);
+        $this->assertSame($resolved, $injector->inject(CircularProvider::class));
+    }
+
+    #[Group(self::TEST_INJECTOR_EXCEPTION)]
     public function testInjectUnknownClassStringThrowsException(): void
     {
         $this->expectException(InjectorException::class);
@@ -903,5 +922,12 @@ final class InjectorTest extends TestCase
         $injector = $this->createInjector();
 
         $this->assertNull($injector->inject($callable));
+    }
+}
+
+final class CircularProvider
+{
+    public function __construct(public ?CircularProvider $dependency = null)
+    {
     }
 }

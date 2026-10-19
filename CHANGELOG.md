@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-10-19
+
+### Fixed
+
+- Reject circular construction with `InjectorException` and clear in-progress resolution state after failures so later resolutions can recover.
+
+### Changed
+
+- Replace version-specific next-release instructions with reusable publishing checks in the README and bilingual guide.
+
 ## [1.0.3] - 2026-10-19
 
 ### Added
