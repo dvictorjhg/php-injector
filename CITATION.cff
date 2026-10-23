@@ -10,6 +10,6 @@ authors:
 repository-code: https://github.com/dvictorjhg/php-injector
 url: https://github.com/dvictorjhg/php-injector
 license: Apache-2.0
-version: 1.0.4
-date-released: 2026-10-19
+version: 1.0.5
+date-released: 2026-10-23
 abstract: Lightweight reflection-based dependency injection and PSR-11 container for PHP.

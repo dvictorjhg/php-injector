@@ -43,6 +43,16 @@ final class InjectorTest extends TestCase
     private const string TEST_INJECT_ATTRIBUTE = 'TEST_INJECT_ATTRIBUTE';
     private const string ERR_NO_VALID_INJECTION_TARGET = 'No valid injection target provided.';
 
+    #[Group(self::TEST_METHOD_INJECTION)]
+    public function testRejectsInstanceMethodWhenProviderIsNotAnObject(): void
+    {
+        $this->createInjector([\ArrayObject::class => 'not-an-object']);
+        $this->expectException(InjectorException::class);
+        $this->expectExceptionMessage("Target 'ArrayObject' did not resolve to an object.");
+
+        Injector::inject([\ArrayObject::class, 'count']);
+    }
+
     #[Group(self::TEST_INJECTOR_CONSTRUCT)]
     public function testNewInjectorWithoutProviders(): void
     {

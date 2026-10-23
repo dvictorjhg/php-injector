@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Audit dependencies
+        run: composer audit
+
+      - name: Check platform requirements
+        run: composer check-platform-reqs
+
       - name: Verify executable documentation
         if: matrix.php-version == '8.5'
         run: php tools/check-docs.php

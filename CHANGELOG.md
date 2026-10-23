@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-10-23
+
+### Security
+
+- Require PHP 8.3.36+, 8.4.27+, or 8.5.12+ while retaining all supported PHP minor versions.
+- Audit Composer dependencies and check platform requirements in CI.
+- Document trusted injection targets and request-specific data risks in long-running processes.
+
+### Changed
+
+- Cover non-object instance-method providers and sparse variadic arguments, reaching 100% statement coverage.
+
 ## [1.0.4] - 2026-10-19
 
 ### Fixed

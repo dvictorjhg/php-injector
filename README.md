@@ -37,7 +37,7 @@ one file. Every complete example includes the Composer autoloader.
 
 ## Requirements
 
-- PHP 8.3+
+- PHP 8.3.36+, 8.4.27+, or 8.5.12+ (security-patched releases)
 - Composer
 
 ## Installation

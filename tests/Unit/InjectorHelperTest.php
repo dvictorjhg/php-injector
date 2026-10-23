@@ -330,6 +330,27 @@ final class InjectorHelperTest extends TestCase
         );
     }
 
+    public function testGetArgumentValueCollectsOnlyRemainingVariadicPositions(): void
+    {
+        $missingValue = $this->missingValue();
+
+        $this->assertSame(
+            ['first', 'second'],
+            InjectorHelper::getArgumentValue(
+                [0 => 'before', 1 => 'first', 3 => 'second', 'unrelated' => 'ignored'],
+                '',
+                'items',
+                1,
+                $missingValue,
+                true
+            )
+        );
+        $this->assertSame(
+            $missingValue,
+            InjectorHelper::getArgumentValue([0 => 'before'], '', 'items', 1, $missingValue, true)
+        );
+    }
+
     private function parameterFromMethod(string $methodName): \ReflectionParameter
     {
         return $this->reflectionMethod($methodName)->getParameters()[0];
